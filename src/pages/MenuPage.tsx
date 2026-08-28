@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
-import { NoiseBg } from './components/ui/NoiseBg'
-import { SiteNav } from './components/nav/SiteNav'
-import { MENU_CATEGORIES, MENU_SOURCE_STATUS } from './data/menu'
-import './menu.css'
+import { NoiseBg } from '@/components/visual/NoiseBg'
+import { SiteNav } from '@/components/nav/SiteNav'
+import { MENU_CATEGORIES, MENU_SOURCE_STATUS } from '@/data/menu'
 
 function menuImageSeed(categoryId: string, itemId: string) {
   return `contrast-${categoryId}-${itemId}`

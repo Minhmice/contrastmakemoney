@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Dialog } from '@base-ui/react/dialog'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -25,10 +25,6 @@ const NAV_ITEMS: readonly NavItem[] = [
   { key: 'locations', label: 'CƠ SỞ', href: '/#locations', spyTarget: '#locations' },
 ]
 
-// Below this the bar always stays put, so the first scroll gesture of a session
-// never flickers it away.
-const REVEAL_THRESHOLD = 90
-
 type SiteNavProps = {
   /** Marks the item matching the current page. */
   current?: NavKey
@@ -37,32 +33,8 @@ type SiteNavProps = {
 }
 
 export function SiteNav({ current, spy = false }: SiteNavProps) {
-  const navRef = useRef<HTMLElement>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [readingKey, setReadingKey] = useState<NavKey | undefined>(undefined)
-
-  // Hide while reading down, return the moment intent reverses. ScrollTrigger is
-  // the only mechanism that behaves identically on both pages, since one runs
-  // Lenis and the other is on native scroll.
-  useEffect(() => {
-    const nav = navRef.current
-    if (!nav) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-
-    let hidden = false
-    const trigger = ScrollTrigger.create({
-      start: 0,
-      end: 'max',
-      onUpdate: (self) => {
-        const next = self.scroll() > REVEAL_THRESHOLD && self.direction === 1
-        if (next === hidden) return
-        hidden = next
-        nav.dataset.hidden = next ? 'true' : 'false'
-      },
-    })
-
-    return () => trigger.kill()
-  }, [])
 
   useEffect(() => {
     if (!spy) return
@@ -96,10 +68,10 @@ export function SiteNav({ current, spy = false }: SiteNavProps) {
 
   return (
     <Dialog.Root open={drawerOpen} onOpenChange={setDrawerOpen} modal>
-      <header className="site-nav" ref={navRef} data-hidden="false">
+      <header className="site-nav">
         <div className="site-nav__inner">
           <a className="site-nav__brand" href="/" aria-label="Contrast Coffee, về trang chủ">
-            <ContrastLogo variant="wordmark-light" className="site-nav__logo" />
+            <ContrastLogo variant="wordmark-dark" className="site-nav__logo" />
           </a>
 
           <div className="site-nav__cluster">

@@ -2,8 +2,6 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { ArrowLeft, ArrowUpRight, Check, Eye, EyeOff, LockKeyhole, Mail, Phone, UserRound } from 'lucide-react'
 import { ContrastLogo } from '@/components/brand/ContrastLogo'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Input } from '@/components/ui/input'
 import { AuthField } from '@/components/shared'
 
 type AuthMode = 'login' | 'register'
@@ -100,8 +98,4 @@ export default function AuthPage() {
       </section>
     </main>
   )
-}
-
-function AuthField({ label, error, errorId, icon, action, children }: { label: string; error?: string; errorId: string; icon: React.ReactNode; action?: React.ReactNode; children: React.ReactNode }) {
-  return <label className="auth-field"><span>{label}</span><span className="auth-input" data-invalid={Boolean(error)}><span aria-hidden="true">{icon}</span>{children}{action}</span>{error ? <small id={errorId} role="alert">{error}</small> : null}</label>
 }

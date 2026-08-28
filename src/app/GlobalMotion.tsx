@@ -23,7 +23,6 @@ export default function GlobalMotion({ children }: { children: ReactNode }) {
     })
     const syncScroll = (time: number) => lenis.raf(time * 1000)
     const removeScrollListener = lenis.on('scroll', ScrollTrigger.update)
-    // Overlays need to pause smooth scroll; body overflow alone does not stop Lenis.
     const unregisterScroller = registerScroller(lenis)
 
     gsap.ticker.add(syncScroll)
@@ -33,7 +32,11 @@ export default function GlobalMotion({ children }: { children: ReactNode }) {
     const initialHashFrame = window.requestAnimationFrame(() => {
       const targetId = window.location.hash.slice(1)
       const target = targetId ? document.getElementById(targetId) : null
-      if (target) lenis.scrollTo(target, { immediate: true })
+      if (target) {
+        window.history.replaceState(null, '', `#${targetId}`)
+        lenis.resize()
+        lenis.scrollTo(target, { immediate: true, force: true })
+      }
       refresh()
     })
     window.addEventListener('load', refresh, { once: true })

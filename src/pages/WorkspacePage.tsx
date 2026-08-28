@@ -70,7 +70,6 @@ export default function WorkspacePage() {
 
   return (
     <div className="workspace-shell">
-      {/* THESIS: Workspace turns discipline into a visible working rhythm, not another dashboard. OWN-WORLD: cool paper, ink-black workbench, red phase marker, square controls, Geist type. STORY: choose one task, start one timed round, record the next concrete step. FIRST VIEWPORT: a split workbench puts the live timer on the left and today's task list on the right, with the primary action inside the timer. FORM: rolled operate surface, centre-rail workbench; seed b0e68c9c. FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance. */}
       <a className="skip-link" href="#workspace-content">Bỏ qua đến workspace</a>
       <header className="workspace-header">
         <a href="/" aria-label="Về trang chủ Contrast Coffee">

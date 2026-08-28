@@ -8,43 +8,9 @@
   top: 0;
   left: 0;
   width: 100%;
-  color: var(--paper);
-  transition:
-    opacity 200ms var(--ease-out),
-    transform 200ms var(--ease-out);
-}
-
-/* No bar, no border, no blur: just an ink wash off the top edge. It carries the
-   contrast for the labels over paper sections and disappears entirely over the
-   ink ones. A single wash is what lets one navbar sit over the split hero and the
-   split menu cover, where a tone switch could only ever be right on one side. */
-.site-nav::before {
-  position: absolute;
-  z-index: -1;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: calc(var(--nav-h) + 34px);
-  pointer-events: none;
-  content: '';
-  /* Held at ~0.56 across the label band so 11px paper text clears AA over the
-     paper sections, then dropped fast so it reads as an edge, not a bar. */
-  background: linear-gradient(
-    to bottom,
-    rgba(17, 17, 15, 0.58) 0%,
-    rgba(17, 17, 15, 0.56) 46%,
-    rgba(17, 17, 15, 0.22) 78%,
-    rgba(17, 17, 15, 0) 100%
-  );
-}
-
-.site-nav[data-hidden='true'] {
-  opacity: 0;
-  pointer-events: none;
-  /* Leaving is lazier than returning: nobody is watching the exit, and the
-     reader asked for the entrance by reversing scroll. */
-  transform: translateY(-20px);
-  transition-duration: 300ms;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
 }
 
 /* Shares the hero's horizontal padding so the logo and the cluster land on the
@@ -257,16 +223,6 @@
 
 /* Orientation must survive without movement. */
 @media (prefers-reduced-motion: reduce) {
-  .site-nav {
-    transition: none;
-  }
-
-  .site-nav[data-hidden='true'] {
-    opacity: 1;
-    pointer-events: auto;
-    transform: none;
-  }
-
   .site-nav__marker,
   .nav-drawer {
     transition: none;
