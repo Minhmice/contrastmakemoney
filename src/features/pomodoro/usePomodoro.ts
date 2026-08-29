@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import { createPomodoroState, pomodoroReducer } from './reducer.ts'
 import { getDisplaySeconds } from './timer.ts'
+import type { PomodoroSettings } from './types.ts'
 
 export function usePomodoro() {
   const [state, dispatch] = useReducer(pomodoroReducer, undefined, createPomodoroState)
@@ -27,9 +28,10 @@ export function usePomodoro() {
   const start = useCallback(() => dispatch({ type: 'START', now: Date.now() }), [])
   const reset = useCallback(() => dispatch({ type: 'RESET' }), [])
   const skip = useCallback(() => dispatch({ type: 'SKIP' }), [])
+  const setSettings = useCallback((settings: PomodoroSettings) => dispatch({ type: 'SET_SETTINGS', settings }), [])
   const setDuration = useCallback((minutes: number) => dispatch({ type: 'SET_DURATION', minutes }), [])
   const remainingSeconds = getDisplaySeconds(state.remainingSeconds, state.endsAt, now)
   const displayState = useMemo(() => ({ ...state, remainingSeconds }), [remainingSeconds, state])
 
-  return { state: displayState, start, reset, skip, setDuration }
+  return { state: displayState, start, reset, skip, setDuration, setSettings }
 }

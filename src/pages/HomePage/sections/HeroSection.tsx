@@ -1,74 +1,70 @@
-import { ArrowDownRight, ArrowUpRight } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { ArrowUpRight } from 'lucide-react'
 import { BrandLink } from '@/components/shared/BrandLink'
-import { SectionLabel } from '@/components/shared/SectionLabel'
 import { Button } from '@/components/ui/button'
+
+const HERO_VIDEO = '/video/contrast-wall-of-wishes.mp4'
+const HERO_POSTER = '/video/contrast-wall-of-wishes.webp'
 
 type HeroSectionProps = {
   onFindLocations: () => void
 }
 
 export function HeroSection({ onFindLocations }: HeroSectionProps) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const syncMotionPreference = () => {
+      if (!videoRef.current) return
+      if (mediaQuery.matches) videoRef.current.pause()
+      else void videoRef.current.play()
+    }
+
+    syncMotionPreference()
+    mediaQuery.addEventListener('change', syncMotionPreference)
+    return () => mediaQuery.removeEventListener('change', syncMotionPreference)
+  }, [])
+
   return (
     <section className="hero" id="top">
       <div className="hero__paper">
-        <div className="hero__meta">
-          <span>01 / 11</span>
-          <span>HỒ CHÍ MINH CITY</span>
-        </div>
         <div className="hero__copy">
-          <SectionLabel>KIÊN TRÌ — KỶ LUẬT</SectionLabel>
           <h1>
-            CÒN VIỆC
+            CÒN VIỆC?
             <br />
-            <span>THÌ CÒN</span>
-            <br />
-            CONTRAST.
+            <span>CÒN CONTRAST.</span>
           </h1>
           <p className="hero__lede">
-            Một chỗ để ngồi xuống.
-            <br />
-            Tập trung vào việc cần làm.
-            <br />
-            Và làm cho xong.
+            Một chỗ để tập trung, làm việc và hoàn thành điều đang dang dở.
           </p>
           <div className="hero__actions">
-            <Button className="button button--red" onClick={onFindLocations}>
-              TÌM CƠ SỞ <ArrowUpRight size={16} strokeWidth={1.7} aria-hidden="true" />
+            <Button
+              className="button button--red hero__location-button"
+              size="lg"
+              onClick={onFindLocations}
+            >
+              <span className="hero__location-button__label">TÌM CƠ SỞ</span>
+              <ArrowUpRight size={16} strokeWidth={1.7} aria-hidden="true" />
             </Button>
-            <BrandLink href="/menu">
-              XEM MENU <ArrowDownRight size={16} strokeWidth={1.7} aria-hidden="true" />
-            </BrandLink>
+            <BrandLink href="/menu">XEM MENU</BrandLink>
           </div>
         </div>
-        <div className="hero__side-note">
-          <span>CONTRAST COFFEE 24H</span>
-          <span>STUDY · WORK · COFFEE</span>
-        </div>
       </div>
-      <div className="hero__ink">
-        <div className="hero__red-square" aria-hidden="true">
-          <span>
-            CONTRAST
-            <br />
-            COFFEE
-          </span>
-          <span className="hero__red-square__cross">+</span>
-        </div>
-        <div className="hero__index">
-          / / / <span>FOCUS MODE</span>
-        </div>
-        <p className="hero__ink-copy">
-          ĐỪNG CHỜ
-          <br />
-          <em>ĐÚNG MOOD.</em>
-        </p>
-        <div className="hero__stamp" aria-hidden="true">
-          24H <span>—</span> STUDY <span>—</span> WORK <span>—</span> COFFEE <span>—</span>
-        </div>
-      </div>
-      <div className="scroll-cue" aria-hidden="true">
-        <span>CUỘN ĐỂ VÀO VIỆC</span>
-        <ArrowDownRight size={18} strokeWidth={1.5} />
+      <div className="hero__media">
+        <video
+          ref={videoRef}
+          className="hero__video"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          poster={HERO_POSTER}
+          aria-hidden="true"
+        >
+          <source src={HERO_VIDEO} type="video/mp4" />
+        </video>
       </div>
     </section>
   )

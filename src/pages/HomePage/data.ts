@@ -9,12 +9,12 @@ export type HomeMenuItem = {
 export const HOME_MENU_TABS = MENU_CATEGORIES.map((category) => category.name)
 
 export const HOME_MENU_GROUPS: Record<string, HomeMenuItem[]> = Object.fromEntries(
-  MENU_CATEGORIES.map((category) => [
+  MENU_CATEGORIES.filter((category) => category.name !== 'TOPPING').map((category) => [
     category.name,
-    category.items.slice(0, 3).map((item) => ({
-      name: item.name.toUpperCase(),
-      detail: item.detail,
-      price: MENU_SOURCE_STATUS === 'pending' ? '[GIÁ MINH HOẠ]' : `${item.price}k`,
+    category.products.slice(0, 3).map((product) => ({
+      name: product.nameVi.toUpperCase(),
+      detail: product.description,
+      price: MENU_SOURCE_STATUS === 'pending' ? '[GIÁ MINH HOẠ]' : `${product.prices.M ?? product.prices.L ?? 0}K`,
     })),
   ]),
 )

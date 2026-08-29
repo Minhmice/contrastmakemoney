@@ -1,4 +1,4 @@
-import { ArrowDownRight, ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 type FinalCtaSectionProps = {
@@ -8,10 +8,6 @@ type FinalCtaSectionProps = {
 export function FinalCtaSection({ onFindLocations }: FinalCtaSectionProps) {
   return (
     <section className="final-cta section-dark">
-      <div className="final-cta__top">
-        <span>10 — 11</span>
-        <span>CONTRAST COFFEE 24H</span>
-      </div>
       <div className="final-cta__grid">
         <h2>
           VIỆC
@@ -28,11 +24,16 @@ export function FinalCtaSection({ onFindLocations }: FinalCtaSectionProps) {
             <br />
             Mang theo việc cần hoàn thành.
           </p>
-          <Button type="button" className="button button--white" onClick={onFindLocations}>
-            TÌM CƠ SỞ <ArrowUpRight size={16} strokeWidth={1.7} aria-hidden="true" />
+          <Button
+            type="button"
+            className="button button--white"
+            onClick={onFindLocations}
+          >
+            <span>TÌM CƠ SỞ</span>
+            <ArrowUpRight size={16} strokeWidth={1.7} aria-hidden="true" />
           </Button>
           <a className="text-link text-link--light" href="/menu">
-            XEM MENU <ArrowDownRight size={16} strokeWidth={1.7} aria-hidden="true" />
+            XEM MENU
           </a>
         </div>
       </div>

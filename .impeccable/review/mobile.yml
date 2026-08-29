@@ -1,0 +1,56 @@
+- main [ref=f3e4]:
+  - generic [ref=f3e5]:
+    - link "Contrast Staff" [ref=f3e6] [cursor=pointer]:
+      - /url: /staff/check-in
+      - generic [ref=f3e7]: C
+    - button "ĐĂNG XUẤT" [ref=f3e9] [cursor=pointer]
+  - generic [ref=f3e13]:
+    - generic [ref=f3e14]:
+      - text: "01"
+      - generic [ref=f3e15]: OPERATIONS
+    - generic [ref=f3e16]:
+      - paragraph [ref=f3e17]: LIVE / HÔM NAY
+      - heading [level=1] [ref=f3e20]:
+        - text: MISSION
+        - emphasis [ref=f3e21]: CONTROL.
+      - paragraph [ref=f3e22]: Một màn hình. Một nhịp vận hành. Tạo QR và giữ luồng điểm danh chạy đúng.
+  - region "Thông số vận hành" [ref=f3e23]:
+    - article [ref=f3e24]:
+      - generic [ref=f3e25]: CHECK-IN
+      - strong [ref=f3e29]: "00"
+      - generic [ref=f3e30]: HÔM NAY
+    - article [ref=f3e31]:
+      - generic [ref=f3e32]: ORDER
+      - strong [ref=f3e35]: "00"
+      - text: HÔM NAY
+    - article [ref=f3e36]:
+      - generic [ref=f3e37]: QR LIVE
+      - strong [ref=f3e41]: "00"
+      - text: ĐANG HIỆU LỰC
+    - article [ref=f3e42]:
+      - generic [ref=f3e43]: MEMBERS
+      - strong [ref=f3e49]: "02"
+      - text: TOÀN HỆ THỐNG
+  - generic [ref=f3e50]:
+    - generic [ref=f3e51]:
+      - generic [ref=f3e52]:
+        - paragraph [ref=f3e53]: 02 / QR STATION
+        - heading "PHÁT MÃ ĐIỂM DANH." [level=2] [ref=f3e54]: PHÁT MÃĐIỂM DANH.
+        - paragraph [ref=f3e55]: Mỗi mã tồn tại 05 phút và chỉ dùng một lần.
+      - generic [ref=f3e56]:
+        - generic [ref=f3e57]: CƠ SỞ
+        - combobox "CƠ SỞ" [ref=f3e61]:
+          - option "PHAN VĂN TRỊ" [selected]
+          - option "THẢO ĐIỀN"
+          - option "TÂN BÌNH"
+      - button "TẠO QR 05:00" [ref=f3e62] [cursor=pointer]
+      - generic [ref=f3e72]:
+        - generic [ref=f3e73]: STATION
+        - strong [ref=f3e74]: PHAN VĂN TRỊ
+    - generic [ref=f3e76]:
+      - generic [ref=f3e83]: QR STANDBY
+      - strong [ref=f3e84]: PHAN VĂN TRỊ
+      - paragraph [ref=f3e85]: Chọn cơ sở, sau đó phát mã.
+  - generic [ref=f3e86]:
+    - generic [ref=f3e87]: CONTRAST / KIÊN TRÌ — KỶ LUẬT
+    - generic [ref=f3e88]: AUTHORIZED STAFF ONLY

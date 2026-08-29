@@ -1,24 +1,35 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { ArrowLeft, ArrowUpRight, Check, Eye, EyeOff, LockKeyhole, Mail, Phone, UserRound } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, Eye, EyeOff, LockKeyhole, Mail, UserRound } from 'lucide-react'
 import { ContrastLogo } from '@/components/brand/ContrastLogo'
 import { Button } from '@/components/ui/button'
 import { AuthField } from '@/components/shared'
+import { supabase } from '@/lib/supabase'
+import { isCurrentUserStaff } from '@/features/user-data/api'
 
 type AuthMode = 'login' | 'register'
-type FieldErrors = Partial<Record<'name' | 'phone' | 'email' | 'password' | 'confirmPassword', string>>
-type FormValues = { name: string; phone: string; email: string; password: string; confirmPassword: string }
+type FieldErrors = Partial<Record<'name' | 'email' | 'password' | 'confirmPassword', string>>
+type FormValues = { name: string; email: string; password: string; confirmPassword: string }
 
-const EMPTY_FORM: FormValues = { name: '', phone: '', email: '', password: '', confirmPassword: '' }
+const EMPTY_FORM: FormValues = { name: '', email: '', password: '', confirmPassword: '' }
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function validate(mode: AuthMode, values: FormValues) {
   const errors: FieldErrors = {}
   if (mode === 'register' && values.name.trim().length < 2) errors.name = 'Tên cần ít nhất 2 ký tự.'
-  if (mode === 'register' && values.phone.trim() && !/^[+\d][\d\s().-]{7,}$/.test(values.phone.trim())) errors.phone = 'Nhập số điện thoại hợp lệ.'
-  if (!EMAIL_PATTERN.test(values.email)) errors.email = 'Nhập email hợp lệ.'
+  if (!EMAIL_PATTERN.test(values.email.trim())) errors.email = 'Nhập email hợp lệ.'
   if (values.password.length < 6) errors.password = 'Mật khẩu cần ít nhất 6 ký tự.'
   if (mode === 'register' && values.confirmPassword !== values.password) errors.confirmPassword = 'Mật khẩu chưa khớp.'
   return errors
+}
+
+function getAuthErrorMessage(message: string) {
+  const normalized = message.toLowerCase()
+  if (normalized.includes('invalid login credentials')) return 'Email hoặc mật khẩu không đúng.'
+  if (normalized.includes('user already registered') || normalized.includes('already been registered')) return 'Email này đã có tài khoản.'
+  if (normalized.includes('password should be at least')) return 'Mật khẩu chưa đạt yêu cầu bảo mật.'
+  if (normalized.includes('rate limit')) return 'Bạn thử quá nhiều lần. Vui lòng chờ rồi thử lại.'
+  if (normalized.includes('failed to fetch') || normalized.includes('network')) return 'Không thể kết nối máy chủ. Kiểm tra mạng rồi thử lại.'
+  return 'Không thể xác thực lúc này. Vui lòng thử lại.'
 }
 
 export default function AuthPage() {
@@ -26,7 +37,8 @@ export default function AuthPage() {
   const [values, setValues] = useState<FormValues>(EMPTY_FORM)
   const [errors, setErrors] = useState<FieldErrors>({})
   const [showPassword, setShowPassword] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
+  const [pending, setPending] = useState(false)
+  const [formError, setFormError] = useState('')
 
   useEffect(() => {
     document.body.classList.add('auth-is-open')
@@ -36,20 +48,49 @@ export default function AuthPage() {
   const changeMode = (nextMode: AuthMode) => {
     setMode(nextMode)
     setErrors({})
-    setSubmitted(false)
+    setFormError('')
   }
 
   const updateField = (field: keyof FormValues, value: string) => {
     setValues((current) => ({ ...current, [field]: value }))
     setErrors((current) => ({ ...current, [field]: undefined }))
-    setSubmitted(false)
+    setFormError('')
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (pending) return
+
     const nextErrors = validate(mode, values)
     setErrors(nextErrors)
-    if (Object.keys(nextErrors).length === 0) setSubmitted(true)
+    setFormError('')
+    if (Object.keys(nextErrors).length > 0) return
+
+    setPending(true)
+    try {
+      const email = values.email.trim().toLowerCase()
+      const result = mode === 'login'
+        ? await supabase.auth.signInWithPassword({ email, password: values.password })
+        : await supabase.auth.signUp({
+            email,
+            password: values.password,
+            options: { data: { full_name: values.name.trim() } },
+          })
+
+      if (result.error) {
+        setFormError(getAuthErrorMessage(result.error.message))
+        return
+      }
+      if (!result.data.session) {
+        setFormError('Tài khoản đã tạo. Kiểm tra email để xác nhận rồi đăng nhập.')
+        return
+      }
+      window.location.replace(await isCurrentUserStaff() ? '/staff/check-in' : '/workspace')
+    } catch {
+      setFormError('Không thể kết nối máy chủ. Kiểm tra mạng rồi thử lại.')
+    } finally {
+      setPending(false)
+    }
   }
 
   return (
@@ -69,30 +110,24 @@ export default function AuthPage() {
       <section className="auth-panel" aria-labelledby="auth-title">
         <div className="auth-panel__inner" id="auth-content" role="tabpanel" aria-labelledby={`${mode}-tab`}>
           <div className="auth-switcher" role="tablist" aria-label="Chọn hình thức truy cập">
-            <Button variant="ghost" type="button" role="tab" id="login-tab" aria-controls="auth-content" aria-selected={mode === 'login'} onClick={() => changeMode('login')}>ĐĂNG NHẬP</Button>
-            <Button variant="ghost" type="button" role="tab" id="register-tab" aria-controls="auth-content" aria-selected={mode === 'register'} onClick={() => changeMode('register')}>ĐĂNG KÝ</Button>
+            <Button variant="ghost" type="button" role="tab" id="login-tab" aria-controls="auth-content" aria-selected={mode === 'login'} disabled={pending} onClick={() => changeMode('login')}>ĐĂNG NHẬP</Button>
+            <Button variant="ghost" type="button" role="tab" id="register-tab" aria-controls="auth-content" aria-selected={mode === 'register'} disabled={pending} onClick={() => changeMode('register')}>ĐĂNG KÝ</Button>
           </div>
 
           <div className="auth-heading" key={mode}>
-            <h2 id="auth-title">{mode === 'login' ? 'Tiếp tục việc đang làm.' : 'Tạo tài khoản Contrast.'}</h2>
+            <h2 id="auth-title">{mode === 'login' ? 'Tiếp tục việc đang làm.' : 'Tạo tài khoản.'}</h2>
           </div>
 
-          {submitted ? (
-            <div className="auth-success" role="status"><span><Check size={22} strokeWidth={2} aria-hidden="true" /></span><div><strong>{mode === 'login' ? 'ĐĂNG NHẬP THÀNH CÔNG.' : 'TÀI KHOẢN ĐÃ SẴN SÀNG.'}</strong><p>Demo giao diện đã xác nhận dữ liệu. Kết nối API khi backend sẵn sàng.</p></div><button type="button" onClick={() => setSubmitted(false)}>QUAY LẠI FORM</button></div>
-          ) : (
-            <form className={`auth-form auth-form--${mode}`} key={mode} onSubmit={handleSubmit} noValidate>
-              {mode === 'register' ? <AuthField label="HỌ VÀ TÊN" error={errors.name} errorId="name-error" icon={<UserRound size={18} strokeWidth={1.6} />}><input autoComplete="name" value={values.name} onChange={(event) => updateField('name', event.target.value)} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? 'name-error' : undefined} placeholder="Nguyễn Minh" /></AuthField> : null}
-              {mode === 'register' ? <AuthField label="SỐ ĐIỆN THOẠI (TÙY CHỌN)" error={errors.phone} errorId="phone-error" icon={<Phone size={18} strokeWidth={1.6} />}><input type="tel" autoComplete="tel" value={values.phone} onChange={(event) => updateField('phone', event.target.value)} aria-invalid={Boolean(errors.phone)} aria-describedby={errors.phone ? 'phone-error' : undefined} placeholder="090 123 4567" /></AuthField> : null}
-              <AuthField label="EMAIL" error={errors.email} errorId="email-error" icon={<Mail size={18} strokeWidth={1.6} />}><input type="email" autoComplete="email" value={values.email} onChange={(event) => updateField('email', event.target.value)} aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? 'email-error' : undefined} placeholder="ban@email.com" /></AuthField>
-              <AuthField label="MẬT KHẨU" error={errors.password} errorId="password-error" icon={<LockKeyhole size={18} strokeWidth={1.6} />} action={<button type="button" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}>{showPassword ? <EyeOff size={18} strokeWidth={1.6} /> : <Eye size={18} strokeWidth={1.6} />}</button>}><input type={showPassword ? 'text' : 'password'} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} value={values.password} onChange={(event) => updateField('password', event.target.value)} aria-invalid={Boolean(errors.password)} aria-describedby={errors.password ? 'password-error' : undefined} placeholder="Tối thiểu 6 ký tự" /></AuthField>
-              {mode === 'register' ? <AuthField label="NHẬP LẠI MẬT KHẨU" error={errors.confirmPassword} errorId="confirm-password-error" icon={<LockKeyhole size={18} strokeWidth={1.6} />}><input type={showPassword ? 'text' : 'password'} autoComplete="new-password" value={values.confirmPassword} onChange={(event) => updateField('confirmPassword', event.target.value)} aria-invalid={Boolean(errors.confirmPassword)} aria-describedby={errors.confirmPassword ? 'confirm-password-error' : undefined} placeholder="Nhập lại mật khẩu" /></AuthField> : null}
+          <form className={`auth-form auth-form--${mode}`} onSubmit={handleSubmit} noValidate aria-busy={pending}>
+            {mode === 'register' ? <AuthField inputId="name" label="HỌ VÀ TÊN" error={errors.name} errorId="name-error" icon={<UserRound size={18} strokeWidth={1.6} />}><input id="name" name="name" autoComplete="name" disabled={pending} value={values.name} onChange={(event) => updateField('name', event.target.value)} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? 'name-error' : undefined} placeholder=" " /></AuthField> : null}
+            <AuthField inputId="email" label="EMAIL" error={errors.email} errorId="email-error" icon={<Mail size={18} strokeWidth={1.6} />}><input id="email" name="email" type="email" autoComplete="email" spellCheck={false} disabled={pending} value={values.email} onChange={(event) => updateField('email', event.target.value)} aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? 'email-error' : undefined} placeholder=" " /></AuthField>
+            <AuthField inputId="password" label="MẬT KHẨU" error={errors.password} errorId="password-error" icon={<LockKeyhole size={18} strokeWidth={1.6} />} action={<button type="button" disabled={pending} onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}>{showPassword ? <EyeOff size={18} strokeWidth={1.6} /> : <Eye size={18} strokeWidth={1.6} />}</button>}><input id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} disabled={pending} value={values.password} onChange={(event) => updateField('password', event.target.value)} aria-invalid={Boolean(errors.password)} aria-describedby={errors.password ? 'password-error' : undefined} placeholder=" " /></AuthField>
+            {mode === 'register' ? <AuthField inputId="confirm-password" label="NHẬP LẠI MẬT KHẨU" error={errors.confirmPassword} errorId="confirm-password-error" icon={<LockKeyhole size={18} strokeWidth={1.6} />}><input id="confirm-password" name="confirmPassword" type={showPassword ? 'text' : 'password'} autoComplete="new-password" disabled={pending} value={values.confirmPassword} onChange={(event) => updateField('confirmPassword', event.target.value)} aria-invalid={Boolean(errors.confirmPassword)} aria-describedby={errors.confirmPassword ? 'confirm-password-error' : undefined} placeholder=" " /></AuthField> : null}
 
-              {mode === 'login' ? <div className="auth-options"><label><input type="checkbox" /><span>GHI NHỚ ĐĂNG NHẬP</span></label><button type="button">QUÊN MẬT KHẨU?</button></div> : <p className="auth-terms">Bằng cách đăng ký, bạn đồng ý với điều khoản sử dụng và chính sách riêng tư.</p>}
-              <button className="auth-submit" type="submit">{mode === 'login' ? 'ĐĂNG NHẬP' : 'TẠO TÀI KHOẢN'}<ArrowUpRight size={18} strokeWidth={1.8} aria-hidden="true" /></button>
-            </form>
-          )}
+            {formError ? <p className="auth-form-error" role="alert">{formError}</p> : null}
+            <button className="auth-submit" type="submit" disabled={pending}>{pending ? 'ĐANG XỬ LÝ...' : mode === 'login' ? 'ĐĂNG NHẬP' : 'TẠO TÀI KHOẢN'}<ArrowUpRight size={18} strokeWidth={1.8} aria-hidden="true" /></button>
+          </form>
 
-          <p className="auth-alternate">{mode === 'login' ? 'CHƯA CÓ TÀI KHOẢN?' : 'ĐÃ CÓ TÀI KHOẢN?'}<button type="button" onClick={() => changeMode(mode === 'login' ? 'register' : 'login')}>{mode === 'login' ? 'ĐĂNG KÝ' : 'ĐĂNG NHẬP'}</button></p>
         </div>
         <span className="auth-index">CC / MEMBER / 01</span>
       </section>

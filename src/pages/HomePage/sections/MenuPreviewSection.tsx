@@ -1,8 +1,11 @@
 import { useState } from 'react'
-import { ArrowDownRight, ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { BrandLink } from '@/components/shared/BrandLink'
-import { SectionLabel } from '@/components/shared/SectionLabel'
-import { HOME_MENU_GROUPS, HOME_MENU_TABS, type HomeMenuItem } from '@/pages/HomePage/data'
+import {
+  HOME_MENU_GROUPS,
+  HOME_MENU_TABS,
+  type HomeMenuItem,
+} from '@/pages/HomePage/data'
 
 type MenuPreviewSectionProps = {
   menuGroups?: Record<string, HomeMenuItem[]>
@@ -19,10 +22,6 @@ export function MenuPreviewSection({
 
   return (
     <section className="menu-section" id="menu">
-      <div className="menu-section__header">
-        <SectionLabel>NẠP LẠI. LÀM TIẾP.</SectionLabel>
-        <span className="chapter-count">06 — 11</span>
-      </div>
       <div className="menu-section__heading">
         <h2>
           COFFEE
@@ -76,7 +75,7 @@ export function MenuPreviewSection({
         ))}
       </div>
       <BrandLink className="menu-preview-link" href="/menu">
-        XEM FULL MENU <ArrowDownRight size={16} strokeWidth={1.7} aria-hidden="true" />
+        XEM FULL MENU
       </BrandLink>
       <span className="menu-placeholder">FULL MENU / PRICES VERIFIED SOON</span>
     </section>

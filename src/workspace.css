@@ -5,7 +5,6 @@
   color: var(--ink);
 }
 
-.workspace-header,
 .workspace-intro,
 .workspace-workbench,
 .workspace-settings,
@@ -15,53 +14,24 @@
   margin: 0 auto;
 }
 
-.workspace-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 76px;
-  border-bottom: 1px solid var(--line);
+#workspace-content {
+  padding-top: var(--nav-h);
 }
 
-.workspace-header__logo {
-  display: block;
-  width: auto;
-  height: 30px;
-}
-
-.workspace-header__nav,
-.workspace-header__nav a,
 .workspace-footer,
 .workspace-footer a {
   display: flex;
   align-items: center;
 }
 
-.workspace-header__nav {
-  gap: 40px;
-  color: var(--muted);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.13em;
-}
-
-.workspace-header__nav a {
-  gap: 8px;
-  min-height: 44px;
-  color: var(--ink);
-}
-
-.workspace-header__nav a svg,
 .workspace-footer a svg {
   transition: transform 180ms var(--ease-out);
 }
 
-.workspace-header__nav a:hover,
 .workspace-footer a:hover {
   color: var(--red-dark);
 }
 
-.workspace-header__nav a:hover svg,
 .workspace-footer a:hover svg {
   transform: translate(3px, -3px);
 }
@@ -325,26 +295,6 @@
   color: var(--muted);
 }
 
-.workspace-task-heading {
-  margin-top: 76px;
-}
-
-.workspace-task-heading h2 {
-  margin: 0;
-  font-size: clamp(34px, 4vw, 56px);
-  font-weight: 780;
-  letter-spacing: -0.07em;
-  line-height: 0.88;
-}
-
-.workspace-task-heading p {
-  max-width: 300px;
-  margin: 20px 0 0;
-  color: var(--ink-soft);
-  font-size: 13px;
-  line-height: 1.5;
-}
-
 .workspace-task-list {
   display: grid;
   gap: 0;
@@ -482,25 +432,6 @@
   font-size: 8px;
 }
 
-.workspace-session-note {
-  display: flex;
-  align-items: flex-start;
-  gap: 13px;
-  color: var(--muted);
-}
-
-.workspace-session-note svg {
-  flex: 0 0 auto;
-  color: var(--red);
-}
-
-.workspace-session-note p {
-  max-width: 220px;
-  margin: 0;
-  font-size: 12px;
-  line-height: 1.55;
-}
-
 .workspace-attendance {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(260px, 0.65fr);
@@ -591,32 +522,15 @@
   .workspace-settings {
     grid-template-columns: 1fr 1fr;
   }
-
-  .workspace-session-note {
-    grid-column: 1 / -1;
-  }
 }
 
 @media (max-width: 640px) {
-  .workspace-header,
   .workspace-intro,
   .workspace-workbench,
   .workspace-settings,
   .workspace-attendance,
   .workspace-footer {
     width: calc(100% - 40px);
-  }
-
-  .workspace-header__nav > span {
-    display: none;
-  }
-
-  .workspace-header {
-    min-height: 68px;
-  }
-
-  .workspace-header__logo {
-    height: 26px;
   }
 
   .workspace-intro {
@@ -665,10 +579,6 @@
     align-items: flex-start;
     flex-direction: column;
     gap: 10px;
-  }
-
-  .workspace-task-heading {
-    margin-top: 54px;
   }
 
   .workspace-task-list {

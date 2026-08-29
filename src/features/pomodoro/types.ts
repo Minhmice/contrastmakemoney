@@ -25,3 +25,4 @@ export type PomodoroAction =
   | { type: 'RESET' }
   | { type: 'SKIP' }
   | { type: 'SET_DURATION'; minutes: number }
+  | { type: 'SET_SETTINGS'; settings: PomodoroSettings }

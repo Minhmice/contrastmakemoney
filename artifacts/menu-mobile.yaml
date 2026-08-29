@@ -1,0 +1,410 @@
+- generic [ref=e4]:
+  - link "Nhảy tới thực đơn" [ref=e5] [cursor=pointer]:
+    - /url: "#menu-stage"
+  - banner [ref=e6]:
+    - generic [ref=e7]:
+      - link "Contrast Coffee, về trang chủ" [ref=e8] [cursor=pointer]:
+        - /url: /
+        - img "Contrast Coffee" [ref=e9]
+      - button "Mở điều hướng" [ref=e11] [cursor=pointer]
+  - main [ref=e13]:
+    - generic [ref=e14]:
+      - paragraph [ref=e15]: CONTRAST COFFEE / MENU STUDY
+      - heading "CHỌN MÓN. GIỮ NHỊP." [level=1] [ref=e16]: CHỌN MÓN.GIỮ NHỊP.
+      - paragraph [ref=e17]: Giá và món đang hiển thị là dữ liệu minh hoạ, cần xác minh trước khi công bố.
+    - generic [ref=e18]:
+      - navigation "Danh mục đồ uống" [ref=e19]:
+        - button "MATCHA" [ref=e20] [cursor=pointer]
+        - button "TRÀ HOA QUẢ" [ref=e22] [cursor=pointer]
+        - button "TRÀ SỮA" [ref=e24] [cursor=pointer]
+        - button "CÀ PHÊ" [ref=e26] [cursor=pointer]
+        - button "COLDBREW" [ref=e28] [cursor=pointer]
+        - button "FREEZE" [ref=e30] [cursor=pointer]
+        - button "NƯỚC HOA QUẢ" [ref=e32] [cursor=pointer]
+        - button "TOPPING" [ref=e34] [cursor=pointer]
+      - button "Đơn tạm tính, 0 món" [ref=e36] [cursor=pointer]
+    - generic [ref=e40]:
+      - generic [ref=e42]:
+        - heading "MATCHA" [level=2] [ref=e44]
+        - list "Món trong danh mục MATCHA" [ref=e48]:
+          - listitem [ref=e49]:
+            - button "Xem chi tiết Matcha Kem Muối" [ref=e50] [cursor=pointer]:
+              - generic [ref=e53]:
+                - generic [ref=e55]: SA
+                - generic [ref=e59]: DRINK IMAGE
+              - generic [ref=e60]:
+                - generic [ref=e61]: Matcha Kem Muối
+                - generic [ref=e62]: Salted Cream Matcha
+                - generic [ref=e63]: 55 / 65
+                - generic [ref=e64]: XEM CHI TIẾT →
+          - listitem [ref=e65]:
+            - button "Xem chi tiết Matcha Đá Xay Kem Dừa" [ref=e66] [cursor=pointer]:
+              - generic [ref=e69]:
+                - generic [ref=e71]: FR
+                - generic [ref=e75]: DRINK IMAGE
+              - generic [ref=e76]:
+                - generic [ref=e77]: Matcha Đá Xay Kem Dừa
+                - generic [ref=e78]: Freeze Coconut Matcha
+                - generic [ref=e79]: 60 / 70
+                - generic [ref=e80]: XEM CHI TIẾT →
+          - listitem [ref=e81]:
+            - button "Xem chi tiết Matcha Latte Sữa Bò" [ref=e82] [cursor=pointer]:
+              - generic [ref=e85]:
+                - generic [ref=e87]: MA
+                - generic [ref=e91]: DRINK IMAGE
+              - generic [ref=e92]:
+                - generic [ref=e93]: Matcha Latte Sữa Bò
+                - generic [ref=e94]: Matcha Latte Dairy Milk
+                - generic [ref=e95]: 65 / 75
+                - generic [ref=e96]: XEM CHI TIẾT →
+          - listitem [ref=e97]:
+            - button "Xem chi tiết Matcha Latte Oatmilk" [ref=e98] [cursor=pointer]:
+              - generic [ref=e101]:
+                - generic [ref=e103]: MA
+                - generic [ref=e107]: DRINK IMAGE
+              - generic [ref=e108]:
+                - generic [ref=e109]: Matcha Latte Oatmilk
+                - generic [ref=e110]: Matcha Latte Oatmilk
+                - generic [ref=e111]: 65 / 75
+                - generic [ref=e112]: XEM CHI TIẾT →
+          - listitem [ref=e113]:
+            - button "Xem chi tiết Matcha Mơ" [ref=e114] [cursor=pointer]:
+              - generic [ref=e117]:
+                - generic [ref=e119]: AP
+                - generic [ref=e123]: DRINK IMAGE
+              - generic [ref=e124]:
+                - generic [ref=e125]: Matcha Mơ
+                - generic [ref=e126]: Apricot Matcha
+                - generic [ref=e127]: 65 / 75
+                - generic [ref=e128]: XEM CHI TIẾT →
+      - generic [ref=e130]:
+        - heading "TRÀ HOA QUẢ" [level=2] [ref=e132]
+        - list "Món trong danh mục TRÀ HOA QUẢ" [ref=e136]:
+          - listitem [ref=e137]:
+            - button "Xem chi tiết Trà Quất Hồng Bì" [ref=e138] [cursor=pointer]:
+              - generic [ref=e141]:
+                - generic [ref=e143]: WA
+                - generic [ref=e147]: DRINK IMAGE
+              - generic [ref=e148]:
+                - generic [ref=e149]: Trà Quất Hồng Bì
+                - generic [ref=e150]: Wampee Tea
+                - generic [ref=e151]: 60 / 65
+                - generic [ref=e152]: XEM CHI TIẾT →
+          - listitem [ref=e153]:
+            - button "Xem chi tiết Trà Hoa Quả Nhiệt Đới" [ref=e154] [cursor=pointer]:
+              - generic [ref=e157]:
+                - generic [ref=e159]: TR
+                - generic [ref=e163]: DRINK IMAGE
+              - generic [ref=e164]:
+                - generic [ref=e165]: Trà Hoa Quả Nhiệt Đới
+                - generic [ref=e166]: Tropical Fruit Tea
+                - generic [ref=e167]: 60 / 65
+                - generic [ref=e168]: XEM CHI TIẾT →
+          - listitem [ref=e169]:
+            - button "Xem chi tiết Ô Long Sen Lựu" [ref=e170] [cursor=pointer]:
+              - generic [ref=e173]:
+                - generic [ref=e175]: LO
+                - generic [ref=e179]: DRINK IMAGE
+              - generic [ref=e180]:
+                - generic [ref=e181]: Ô Long Sen Lựu
+                - generic [ref=e182]: Lotus Pomegranate Oolong Tea
+                - generic [ref=e183]: 60 / 65
+                - generic [ref=e184]: XEM CHI TIẾT →
+          - listitem [ref=e185]:
+            - button "Xem chi tiết Ô Long Cam Xoài" [ref=e186] [cursor=pointer]:
+              - generic [ref=e189]:
+                - generic [ref=e191]: MA
+                - generic [ref=e195]: DRINK IMAGE
+              - generic [ref=e196]:
+                - generic [ref=e197]: Ô Long Cam Xoài
+                - generic [ref=e198]: Mango Oolong Tea
+                - generic [ref=e199]: 60 / 65
+                - generic [ref=e200]: XEM CHI TIẾT →
+      - generic [ref=e202]:
+        - heading "TRÀ SỮA" [level=2] [ref=e204]
+        - list "Món trong danh mục TRÀ SỮA" [ref=e208]:
+          - listitem [ref=e209]:
+            - button "Xem chi tiết Hồng Trà Shan Tuyết" [ref=e210] [cursor=pointer]:
+              - generic [ref=e213]:
+                - generic [ref=e215]: SN
+                - generic [ref=e219]: DRINK IMAGE
+              - generic [ref=e220]:
+                - generic [ref=e221]: Hồng Trà Shan Tuyết
+                - generic [ref=e222]: Snowshan Black Tea
+                - generic [ref=e223]: 60 / 65
+                - generic [ref=e224]: XEM CHI TIẾT →
+          - listitem [ref=e225]:
+            - button "Xem chi tiết Ô Long Nhài" [ref=e226] [cursor=pointer]:
+              - generic [ref=e229]:
+                - generic [ref=e231]: JA
+                - generic [ref=e235]: DRINK IMAGE
+              - generic [ref=e236]:
+                - generic [ref=e237]: Ô Long Nhài
+                - generic [ref=e238]: Jasmine Oolong Tea
+                - generic [ref=e239]: 60 / 65
+                - generic [ref=e240]: XEM CHI TIẾT →
+          - listitem [ref=e241]:
+            - button "Xem chi tiết Gạo Rang Bánh Bò" [ref=e242] [cursor=pointer]:
+              - generic [ref=e245]:
+                - generic [ref=e247]: HO
+                - generic [ref=e251]: DRINK IMAGE
+              - generic [ref=e252]:
+                - generic [ref=e253]: Gạo Rang Bánh Bò
+                - generic [ref=e254]: Honeycomb Rice Tea
+                - generic [ref=e255]: 60 / 65
+                - generic [ref=e256]: XEM CHI TIẾT →
+          - listitem [ref=e257]:
+            - button "Xem chi tiết Ô Long Tứ Quý" [ref=e258] [cursor=pointer]:
+              - generic [ref=e261]:
+                - generic [ref=e263]: FO
+                - generic [ref=e267]: DRINK IMAGE
+              - generic [ref=e268]:
+                - generic [ref=e269]: Ô Long Tứ Quý
+                - generic [ref=e270]: Four Seasons Oolong
+                - generic [ref=e271]: 60 / 65
+                - generic [ref=e272]: XEM CHI TIẾT →
+          - listitem [ref=e273]:
+            - button "Xem chi tiết Gạo Rang" [ref=e274] [cursor=pointer]:
+              - generic [ref=e277]:
+                - generic [ref=e279]: RO
+                - generic [ref=e283]: DRINK IMAGE
+              - generic [ref=e284]:
+                - generic [ref=e285]: Gạo Rang
+                - generic [ref=e286]: Roasted Rice Milk Tea
+                - generic [ref=e287]: 60 / 65
+                - generic [ref=e288]: XEM CHI TIẾT →
+          - listitem [ref=e289]:
+            - button "Xem chi tiết Hoa Vải" [ref=e290] [cursor=pointer]:
+              - generic [ref=e293]:
+                - generic [ref=e295]: FL
+                - generic [ref=e299]: DRINK IMAGE
+              - generic [ref=e300]:
+                - generic [ref=e301]: Hoa Vải
+                - generic [ref=e302]: Floral Lychee Tea
+                - generic [ref=e303]: 60 / 65
+                - generic [ref=e304]: XEM CHI TIẾT →
+      - generic [ref=e306]:
+        - heading "CÀ PHÊ" [level=2] [ref=e308]
+        - list "Món trong danh mục CÀ PHÊ" [ref=e312]:
+          - listitem [ref=e313]:
+            - button "Xem chi tiết Cà Phê Đen" [ref=e314] [cursor=pointer]:
+              - generic [ref=e317]:
+                - generic [ref=e319]: BL
+                - generic [ref=e323]: DRINK IMAGE
+              - generic [ref=e324]:
+                - generic [ref=e325]: Cà Phê Đen
+                - generic [ref=e326]: Black Coffee
+                - generic [ref=e327]: 45 / 50
+                - generic [ref=e328]: XEM CHI TIẾT →
+          - listitem [ref=e329]:
+            - button "Xem chi tiết Americano" [ref=e330] [cursor=pointer]:
+              - generic [ref=e333]:
+                - generic [ref=e335]: AM
+                - generic [ref=e339]: DRINK IMAGE
+              - generic [ref=e340]:
+                - generic [ref=e341]: Americano
+                - generic [ref=e342]: Americano
+                - generic [ref=e343]: 50 / 55
+                - generic [ref=e344]: XEM CHI TIẾT →
+          - listitem [ref=e345]:
+            - button "Xem chi tiết Cà Phê Nâu" [ref=e346] [cursor=pointer]:
+              - generic [ref=e349]:
+                - generic [ref=e351]: VI
+                - generic [ref=e355]: DRINK IMAGE
+              - generic [ref=e356]:
+                - generic [ref=e357]: Cà Phê Nâu
+                - generic [ref=e358]: Vietnamese Brown Coffee
+                - generic [ref=e359]: 50 / 55
+                - generic [ref=e360]: XEM CHI TIẾT →
+          - listitem [ref=e361]:
+            - button "Xem chi tiết Bạc Xỉu" [ref=e362] [cursor=pointer]:
+              - generic [ref=e365]:
+                - generic [ref=e367]: VI
+                - generic [ref=e371]: DRINK IMAGE
+              - generic [ref=e372]:
+                - generic [ref=e373]: Bạc Xỉu
+                - generic [ref=e374]: Vietnamese White Coffee
+                - generic [ref=e375]: 55 / 60
+                - generic [ref=e376]: XEM CHI TIẾT →
+          - listitem [ref=e377]:
+            - button "Xem chi tiết Khói" [ref=e378] [cursor=pointer]:
+              - generic [ref=e381]:
+                - generic [ref=e383]: SM
+                - generic [ref=e387]: DRINK IMAGE
+              - generic [ref=e388]:
+                - generic [ref=e389]: Khói
+                - generic [ref=e390]: Smoky Coffee
+                - generic [ref=e391]: 60 / 65
+                - generic [ref=e392]: XEM CHI TIẾT →
+          - listitem [ref=e393]:
+            - button "Xem chi tiết Latte" [ref=e394] [cursor=pointer]:
+              - generic [ref=e397]:
+                - generic [ref=e399]: LA
+                - generic [ref=e403]: DRINK IMAGE
+              - generic [ref=e404]:
+                - generic [ref=e405]: Latte
+                - generic [ref=e406]: Latte
+                - generic [ref=e407]: 60 / 65
+                - generic [ref=e408]: XEM CHI TIẾT →
+          - listitem [ref=e409]:
+            - button "Xem chi tiết Cà Phê Muối" [ref=e410] [cursor=pointer]:
+              - generic [ref=e413]:
+                - generic [ref=e415]: SA
+                - generic [ref=e419]: DRINK IMAGE
+              - generic [ref=e420]:
+                - generic [ref=e421]: Cà Phê Muối
+                - generic [ref=e422]: Salted Cream Coffee
+                - generic [ref=e423]: 60 / 65
+                - generic [ref=e424]: XEM CHI TIẾT →
+      - generic [ref=e426]:
+        - heading "COLDBREW" [level=2] [ref=e428]
+        - list "Món trong danh mục COLDBREW" [ref=e432]:
+          - listitem [ref=e433]:
+            - button "Xem chi tiết Cold Brew Chanh" [ref=e434] [cursor=pointer]:
+              - generic [ref=e437]:
+                - generic [ref=e439]: LE
+                - generic [ref=e443]: DRINK IMAGE
+              - generic [ref=e444]:
+                - generic [ref=e445]: Cold Brew Chanh
+                - generic [ref=e446]: Lemon Cold Brew
+                - generic [ref=e447]: 60 / 65
+                - generic [ref=e448]: XEM CHI TIẾT →
+          - listitem [ref=e449]:
+            - button "Xem chi tiết Cold Brew Đào" [ref=e450] [cursor=pointer]:
+              - generic [ref=e453]:
+                - generic [ref=e455]: PE
+                - generic [ref=e459]: DRINK IMAGE
+              - generic [ref=e460]:
+                - generic [ref=e461]: Cold Brew Đào
+                - generic [ref=e462]: Peach Cold Brew
+                - generic [ref=e463]: 60 / 65
+                - generic [ref=e464]: XEM CHI TIẾT →
+          - listitem [ref=e465]:
+            - button "Xem chi tiết Cold Brew Quả Mọng" [ref=e466] [cursor=pointer]:
+              - generic [ref=e469]:
+                - generic [ref=e471]: BE
+                - generic [ref=e475]: DRINK IMAGE
+              - generic [ref=e476]:
+                - generic [ref=e477]: Cold Brew Quả Mọng
+                - generic [ref=e478]: Berry Cold Brew
+                - generic [ref=e479]: 60 / 65
+                - generic [ref=e480]: XEM CHI TIẾT →
+          - listitem [ref=e481]:
+            - button "Xem chi tiết Cold Brew Mơ" [ref=e482] [cursor=pointer]:
+              - generic [ref=e485]:
+                - generic [ref=e487]: AP
+                - generic [ref=e491]: DRINK IMAGE
+              - generic [ref=e492]:
+                - generic [ref=e493]: Cold Brew Mơ
+                - generic [ref=e494]: Apricot Cold Brew
+                - generic [ref=e495]: 60 / 65
+                - generic [ref=e496]: XEM CHI TIẾT →
+      - generic [ref=e498]:
+        - heading "FREEZE" [level=2] [ref=e500]
+        - list "Món trong danh mục FREEZE" [ref=e504]:
+          - listitem [ref=e505]:
+            - button "Xem chi tiết Cà Phê Đá Xay" [ref=e506] [cursor=pointer]:
+              - generic [ref=e509]:
+                - generic [ref=e511]: CO
+                - generic [ref=e515]: DRINK IMAGE
+              - generic [ref=e516]:
+                - generic [ref=e517]: Cà Phê Đá Xay
+                - generic [ref=e518]: Coffee Freeze
+                - generic [ref=e519]: 65 / 70
+                - generic [ref=e520]: XEM CHI TIẾT →
+          - listitem [ref=e521]:
+            - button "Xem chi tiết Matcha Đá Xay" [ref=e522] [cursor=pointer]:
+              - generic [ref=e525]:
+                - generic [ref=e527]: MA
+                - generic [ref=e531]: DRINK IMAGE
+              - generic [ref=e532]:
+                - generic [ref=e533]: Matcha Đá Xay
+                - generic [ref=e534]: Matcha Freeze
+                - generic [ref=e535]: 65 / 70
+                - generic [ref=e536]: XEM CHI TIẾT →
+          - listitem [ref=e537]:
+            - button "Xem chi tiết Chocomint Đá Xay" [ref=e538] [cursor=pointer]:
+              - generic [ref=e541]:
+                - generic [ref=e543]: CH
+                - generic [ref=e547]: DRINK IMAGE
+              - generic [ref=e548]:
+                - generic [ref=e549]: Chocomint Đá Xay
+                - generic [ref=e550]: Chocomint Freeze
+                - generic [ref=e551]: 65 / 70
+                - generic [ref=e552]: XEM CHI TIẾT →
+          - listitem [ref=e553]:
+            - button "Xem chi tiết Xoài Chanh Leo Đá Xay" [ref=e554] [cursor=pointer]:
+              - generic [ref=e557]:
+                - generic [ref=e559]: MA
+                - generic [ref=e563]: DRINK IMAGE
+              - generic [ref=e564]:
+                - generic [ref=e565]: Xoài Chanh Leo Đá Xay
+                - generic [ref=e566]: Mango Passion Fruit Freeze
+                - generic [ref=e567]: 65 / 70
+                - generic [ref=e568]: XEM CHI TIẾT →
+      - generic [ref=e570]:
+        - heading "NƯỚC HOA QUẢ" [level=2] [ref=e572]
+        - list "Món trong danh mục NƯỚC HOA QUẢ" [ref=e576]:
+          - listitem [ref=e577]:
+            - button "Xem chi tiết Cam Đào" [ref=e578] [cursor=pointer]:
+              - generic [ref=e581]:
+                - generic [ref=e583]: OR
+                - generic [ref=e587]: DRINK IMAGE
+              - generic [ref=e588]:
+                - generic [ref=e589]: Cam Đào
+                - generic [ref=e590]: Orange Peach
+                - generic [ref=e591]: 60 / 65
+                - generic [ref=e592]: XEM CHI TIẾT →
+          - listitem [ref=e593]:
+            - button "Xem chi tiết Chanh Dứa" [ref=e594] [cursor=pointer]:
+              - generic [ref=e597]:
+                - generic [ref=e599]: PA
+                - generic [ref=e603]: DRINK IMAGE
+              - generic [ref=e604]:
+                - generic [ref=e605]: Chanh Dứa
+                - generic [ref=e606]: Passion Fruit Pineapple
+                - generic [ref=e607]: 60 / 65
+                - generic [ref=e608]: XEM CHI TIẾT →
+          - listitem [ref=e609]:
+            - button "Xem chi tiết Đào Ổi Hồng" [ref=e610] [cursor=pointer]:
+              - generic [ref=e613]:
+                - generic [ref=e615]: PE
+                - generic [ref=e619]: DRINK IMAGE
+              - generic [ref=e620]:
+                - generic [ref=e621]: Đào Ổi Hồng
+                - generic [ref=e622]: Peach Pink Guava
+                - generic [ref=e623]: 60 / 65
+                - generic [ref=e624]: XEM CHI TIẾT →
+      - generic [ref=e626]:
+        - heading "TOPPING" [level=2] [ref=e628]
+        - list "Món trong danh mục TOPPING" [ref=e632]:
+          - listitem [ref=e633]:
+            - button "Xem chi tiết Trân Châu Đen" [ref=e634] [cursor=pointer]:
+              - generic [ref=e637]:
+                - generic [ref=e639]: BL
+                - generic [ref=e643]: DRINK IMAGE
+              - generic [ref=e644]:
+                - generic [ref=e645]: Trân Châu Đen
+                - generic [ref=e646]: Black Pearl
+                - generic [ref=e647]: "5"
+                - generic [ref=e648]: XEM CHI TIẾT →
+          - listitem [ref=e649]:
+            - button "Xem chi tiết Trân Châu Trắng" [ref=e650] [cursor=pointer]:
+              - generic [ref=e653]:
+                - generic [ref=e655]: WH
+                - generic [ref=e659]: DRINK IMAGE
+              - generic [ref=e660]:
+                - generic [ref=e661]: Trân Châu Trắng
+                - generic [ref=e662]: White Pearl
+                - generic [ref=e663]: "5"
+                - generic [ref=e664]: XEM CHI TIẾT →
+          - listitem [ref=e665]:
+            - button "Xem chi tiết Thạch Đào" [ref=e666] [cursor=pointer]:
+              - generic [ref=e669]:
+                - generic [ref=e671]: PE
+                - generic [ref=e675]: DRINK IMAGE
+              - generic [ref=e676]:
+                - generic [ref=e677]: Thạch Đào
+                - generic [ref=e678]: Peach Jelly
+                - generic [ref=e679]: "5"
+                - generic [ref=e680]: XEM CHI TIẾT →

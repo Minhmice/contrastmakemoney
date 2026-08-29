@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { SiteNav } from '@/components/nav/SiteNav'
+import { HomeLoadingScreen } from '@/components/loading/HomeLoadingScreen'
 import { AttendanceTeaserSection } from './sections/AttendanceTeaserSection'
 import { CampaignSection } from './sections/CampaignSection'
 import { CultureSection } from './sections/CultureSection'
@@ -24,6 +25,7 @@ export default function HomePage() {
 
   return (
     <div className="app-shell home-page">
+      <HomeLoadingScreen />
       <a className="skip-link" href="#main-content">
         Bỏ qua đến nội dung chính
       </a>

@@ -79,7 +79,7 @@ export function SiteNav({ current, spy = false }: SiteNavProps) {
               {NAV_ITEMS.map((item) => (
                 <a
                   className="site-nav__link"
-                  key={item.key}
+                  key={`desktop-${item.key}`}
                   href={item.href}
                   data-active={activeKey === item.key}
                   aria-current={current === item.key ? 'page' : undefined}
@@ -116,7 +116,7 @@ export function SiteNav({ current, spy = false }: SiteNavProps) {
           <nav className="nav-drawer__links">
             {NAV_ITEMS.map((item) => (
               <a
-                key={item.key}
+                key={`drawer-${item.key}`}
                 href={item.href}
                 aria-current={current === item.key ? 'page' : undefined}
                 onClick={() => setDrawerOpen(false)}

@@ -1,24 +1,20 @@
 export function CultureSection() {
   return (
     <section className="culture section-red">
-      <div className="culture__side">
-        05 — 11
-        <br />
-        <span>STUDY CULTURE</span>
-      </div>
+      <div className="culture__side">05 — 11</div>
       <div className="culture__main">
         <h2>
-          KHÔNG CẦN
+          KHÔNG ĐỢI
           <br />
-          <span>HỨNG.</span>
+          <span>CÓ HỨNG.</span>
           <br />
-          CẦN
+          CỨ
           <br />
-          <em>KỶ LUẬT.</em>
+          <em>LÀM TIẾP.</em>
         </h2>
-        <p>Có những ngày mọi thứ chạy rất nhanh.</p>
-        <p>Cũng có những ngày một trang tài liệu mất cả tiếng.</p>
-        <strong>Chỉ tạo ra một nơi để bạn tiếp tục.</strong>
+        <p>Có ngày mọi thứ vào guồng. Có ngày chỉ một trang tài liệu cũng thấy khó.</p>
+        <p>Không sao. Kỷ luật không cần ngày nào cũng dễ.</p>
+        <strong>Chỉ cần ngồi xuống và làm tiếp.</strong>
       </div>
       <div className="culture__circle" aria-hidden="true">
         <span>KEEP GOING</span>

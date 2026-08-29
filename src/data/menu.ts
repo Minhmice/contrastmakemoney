@@ -1,156 +1,188 @@
-export type MenuItem = {
+export type MenuSize = 'M' | 'L'
+
+export type MenuTopping = {
   id: string
   name: string
-  english: string
-  price: string
-  detail: string
+  price: number
+}
+
+export type MenuOptions = {
+  sweetness?: readonly number[]
+  ice?: readonly ('Less' | 'Normal')[]
+  toppings?: readonly MenuTopping[]
+}
+
+export type MenuProduct = {
+  id: string
+  category: string
+  nameVi: string
+  nameEn: string
+  description: string
+  image?: string
+  imageHover?: string
+  characteristics: readonly string[]
+  prices: Partial<Record<MenuSize, number>>
+  options: MenuOptions
+  tags: readonly string[]
 }
 
 export type MenuCategory = {
   id: string
   name: string
-  rail: string
-  statement: string
-  tone: 'paper' | 'ink'
-  layout: 'four' | 'three' | 'two' | 'toppings'
-  items: MenuItem[]
+  sideLabel: string
+  theme: 'light' | 'dark'
+  products: readonly MenuProduct[]
 }
 
-const item = (
-  id: string,
-  name: string,
-  english: string,
-  price: string,
-  detail: string,
-): MenuItem => ({
-  id,
-  name,
-  english,
-  price,
-  detail,
-})
+const blackPearl: MenuTopping = { id: 'black-pearl', name: 'Black Pearl', price: 5 }
+const whitePearl: MenuTopping = { id: 'white-pearl', name: 'White Pearl', price: 5 }
 
-export const MENU_CATEGORIES: MenuCategory[] = [
+const standardTeaOptions: MenuOptions = {
+  sweetness: [0, 30, 50, 70, 100],
+  ice: ['Less', 'Normal'],
+  toppings: [blackPearl, whitePearl],
+}
+
+
+const productImages: Record<string, readonly [string, string]> = {
+  'matcha-kem-muoi': ['/images/Matcha Kem Muối/Iced Salted Cream Matcha.png', '/images/Matcha Kem Muối/Salted Cream Matcha Study Desk.png'],
+  'matcha-da-xay-kem-dua': ['/images/Matcha Đá Xay Kem Dừa/Freeze Coconut Matcha Drink Cutout.png', '/images/Matcha Đá Xay Kem Dừa/Freeze Coconut Matcha on a Study Desk.png'],
+  'tra-quat-hong-bi': ['/images/Trà Quất Hồng Bì/0041.png', '/images/Trà Quất Hồng Bì/0040.png'],
+  'tra-hoa-qua-nhiet-doi': ['/images/Trà Hoa Quả Nhiệt Đới/0038.png', '/images/Trà Hoa Quả Nhiệt Đới/0037.png'],
+  'o-long-sen-luu': ['/images/Ô Long Sen Lựu/0035.png', '/images/Ô Long Sen Lựu/0034.png'],
+  'o-long-cam-xoai': ['/images/Ô Long Cam Xoài/0032.png', '/images/Ô Long Cam Xoài/0031.png'],
+  'hong-tra-shan-tuyet': ['/images/Hồng Trà Shan Tuyết/0014.png', '/images/Hồng Trà Shan Tuyết/0013.png'],
+  'hoa-vai': ['/images/Hoa Vải/0016.png', '/images/Hoa Vải/0012.png'],
+  'coffee-freeze': ['/images/Coffee Freeze/0026.png', '/images/Coffee Freeze/0025.png'],
+  'matcha-freeze': ['/images/Matcha Freeze/Matcha Freeze Product Cutout.png', '/images/Matcha Freeze/Matcha Freeze on a Warm Study Desk.png'],
+  'chocomint-freeze': ['/images/Chocomint/Chocomint Freeze Product Cutout.png', '/images/Chocomint/Chocomint freeze on a modern study desk.png'],
+  'xoai-chanh-leo-freeze': ['/images/Xoài Chanh Leo/Mango passion fruit freeze cutout.png', '/images/Xoài Chanh Leo/Mango Passion Fruit Freeze on a Desk.png'],
+  'cam-dao': ['/images/Cam Đào/0011.png', '/images/Cam Đào/0015.png'],
+  'chanh-dua': ['/images/Chanh Dứa/0010.png', '/images/Chanh Dứa/0001.png'],
+  'tran-chau-den': ['/images/Trân Châu Đen/0048.png', '/images/Trân Châu Đen/0047.png'],
+  'tran-chau-trang': ['/images/Trân Châu Trắng/0045.png', '/images/Trân Châu Trắng/0044.png'],
+}
+
+const icedOptions: MenuOptions = {
+  ice: ['Less', 'Normal'],
+}
+
+function product(
+  category: string,
+  id: string,
+  nameVi: string,
+  nameEn: string,
+  description: string,
+  prices: Partial<Record<MenuSize, number>>,
+  options: MenuOptions = {},
+  tags: readonly string[] = [],
+): MenuProduct {
+  const images = productImages[id]
+  return { id, category, nameVi, nameEn, description, image: images?.[0], imageHover: images?.[1], characteristics: tags.length ? tags : description.split(/[,.]/).filter(Boolean).slice(0, 3), prices, options, tags }
+}
+
+export const MENU_CATEGORIES: readonly MenuCategory[] = [
   {
-    id: 'caffein',
-    name: 'CAFFEIN',
-    rail: 'CAFFEIN',
-    statement: 'Cho vòng tập trung đầu tiên.',
-    tone: 'paper',
-    layout: 'four',
-    items: [
-      item('ca-phe-den', 'Cà Phê Đen', 'Black Coffee', '45 / 50', 'Pha phin, đậm và thẳng.'),
-      item('americano', 'Americano', 'Americano', '50 / 55', 'Espresso loãng, sáng vị.'),
-      item('ca-phe-nau', 'Cà Phê Nâu', 'Vietnamese Brown Coffee', '50 / 55', 'Cà phê sữa đặc truyền thống.'),
-      item('bac-xiu', 'Bạc Xỉu', 'Vietnamese White Coffee', '55 / 60', 'Nhiều sữa, ít cà phê, mềm hơn.'),
-      item('khoi', 'Khói', 'Smoky Coffee', '60 / 65', 'Hương khói nhẹ trên nền cà phê.'),
-      item('latte', 'Latte', 'Latte', '60 / 65', 'Espresso và sữa nóng cân bằng.'),
-      item('ca-phe-muoi', 'Cà Phê Muối', 'Salted Cream Coffee', '60 / 65', 'Kem muối trên cà phê đen.'),
-    ],
-  },
-  {
-    id: 'cold-brew',
-    name: 'COLD BREW',
-    rail: 'FUEL YOUR HUSTLE',
-    statement: 'Lạnh, sáng, đủ để làm tiếp.',
-    tone: 'paper',
-    layout: 'four',
-    items: [
-      item('chanh', 'Chanh', 'Lemon Cold Brew', '60 / 65', 'Cold brew và chanh tươi.'),
-      item('dao', 'Đào', 'Peach Cold Brew', '60 / 65', 'Đào ngọt trên nền cà phê lạnh.'),
-      item('qua-mong', 'Quả Mọng', 'Berry Cold Brew', '60 / 65', 'Quả mọng chua nhẹ, tỉnh táo.'),
-      item('mo', 'Mơ', 'Apricot Cold Brew', '60 / 65', 'Mơ thơm, hậu vị sáng.'),
-    ],
-  },
-  {
-    id: 'milk-tea',
-    name: 'TRÀ SỮA',
-    rail: 'NON-CAFFEIN',
-    statement: 'Mềm hơn một nhịp. Vẫn chưa dừng.',
-    tone: 'ink',
-    layout: 'three',
-    items: [
-      item('hong-tra-shan-tuyet', 'Hồng Trà Shan Tuyết', 'Snowshan Black Tea', '60 / 65', 'Hồng trà núi, vị trà rõ.'),
-      item('o-long-nhai', 'Ô Long Nhài', 'Jasmine Oolong Tea', '60 / 65', 'Hoa nhài trên nền ô long.'),
-      item('gao-rang-banh-bo', 'Gạo Rang Bánh Bò', 'Honeycomb Rice Tea', '60 / 65', 'Gạo rang thơm, ngọt nhẹ.'),
-      item('o-long-tu-quy', 'Ô Long Tứ Quý', 'Four Seasons Oolong', '60 / 65', 'Ô long bốn mùa, cân bằng.'),
-      item('gao-rang', 'Gạo Rang', 'Roasted Rice Milktea', '60 / 65', 'Hương gạo rang đậm đà.'),
-      item('hoa-vai', 'Hoa Vải', 'Floral Lychee Tea', '60 / 65', 'Vải thiều và hoa thơm.'),
-    ],
-  },
-  {
-    id: 'fresh-sips',
-    name: 'NƯỚC HOA QUẢ',
-    rail: 'SMOOTH BOOST',
-    statement: 'Đổi vị. Giữ nhịp.',
-    tone: 'paper',
-    layout: 'two',
-    items: [
-      item('cam-dao', 'Cam Đào', 'Orange & Peach', '60 / 65', 'Cam và đào, uống lạnh.'),
-      item('chanh-dua', 'Chanh Dứa', 'Passion Fruit & Pineapple', '60 / 65', 'Chanh leo và dứa tươi.'),
-    ],
-  },
-  {
-    id: 'toppings',
-    name: 'TOPPING',
-    rail: 'THINK CLEAR',
-    statement: 'Thêm một chút. Đủ khác.',
-    tone: 'paper',
-    layout: 'toppings',
-    items: [
-      item('tran-chau-den', 'Trân Châu Đen', 'Black Pearl', '5', 'Trân châu đen dai vừa.'),
-      item('tran-chau-trang', 'Trân Châu Trắng', 'White Pearl', '5', 'Trân châu trắng mềm hơn.'),
+    id: 'matcha',
+    name: 'MATCHA',
+    sideLabel: 'THINK CLEAR',
+    theme: 'light',
+    products: [
+      product('matcha', 'matcha-kem-muoi', 'Matcha Kem Muối', 'Salted Cream Matcha', 'Matcha đậm vị với lớp kem sữa muối nhẹ.', { M: 55, L: 65 }, standardTeaOptions),
+      product('matcha', 'matcha-da-xay-kem-dua', 'Matcha Đá Xay Kem Dừa', 'Freeze Coconut Matcha', 'Matcha xay mịn, kem dừa mát lạnh.', { M: 60, L: 70 }, icedOptions),
+      product('matcha', 'matcha-latte-sua-bo', 'Matcha Latte Sữa Bò', 'Matcha Latte Dairy Milk', 'Matcha latte cân bằng cùng sữa bò.', { M: 65, L: 75 }, standardTeaOptions),
+      product('matcha', 'matcha-latte-sua-hat', 'Matcha Latte Oatmilk', 'Matcha Latte Oatmilk', 'Matcha latte cùng sữa hạt dịu vị.', { M: 65, L: 75 }, standardTeaOptions),
+      product('matcha', 'matcha-mo', 'Matcha Mơ', 'Apricot Matcha', 'Matcha tươi cùng vị mơ sáng.', { M: 65, L: 75 }, standardTeaOptions),
     ],
   },
   {
     id: 'fruit-tea',
     name: 'TRÀ HOA QUẢ',
-    rail: 'FRUIT-BASED',
-    statement: 'Trái cây, trà, và một nhịp tỉnh.',
-    tone: 'ink',
-    layout: 'three',
-    items: [
-      item('tra-quat-hong-bi', 'Trà Quất Hồng Bì', 'Wampee Tea', '60 / 65', 'Quất hồng bì chua thanh.'),
-      item('tra-hoa-qua-nhiet-doi', 'Trà Hoa Quả Nhiệt Đới', 'Tropical Fruit Tea', '60 / 65', 'Trái nhiệt đới tươi.'),
-      item('o-long-sen-luu', 'Ô Long Sen Lựu', 'Lotus Pomegranate Oolong Tea', '60 / 65', 'Sen và lựu trên ô long.'),
-      item('o-long-cam-xoai', 'Ô Long Cam Xoài', 'Mango Oolong Tea', '60 / 65', 'Cam xoài ngọt, trà nhẹ.'),
-      item('tra-coc-xanh', 'Trà Cóc Xanh', 'Ambarella Tea', '60 / 65', 'Cóc xanh chua mát.'),
+    sideLabel: 'REFRESH YOURSELF',
+    theme: 'dark',
+    products: [
+      product('fruit-tea', 'tra-quat-hong-bi', 'Trà Quất Hồng Bì', 'Wampee Tea', 'Trà thanh, quất hồng bì chua nhẹ.', { M: 60, L: 65 }, standardTeaOptions),
+      product('fruit-tea', 'tra-hoa-qua-nhiet-doi', 'Trà Hoa Quả Nhiệt Đới', 'Tropical Fruit Tea', 'Trái cây nhiệt đới trên nền trà sáng.', { M: 60, L: 65 }, standardTeaOptions),
+      product('fruit-tea', 'o-long-sen-luu', 'Ô Long Sen Lựu', 'Lotus Pomegranate Oolong Tea', 'Ô long, sen và lựu tươi.', { M: 60, L: 65 }, standardTeaOptions),
+      product('fruit-tea', 'o-long-cam-xoai', 'Ô Long Cam Xoài', 'Mango Oolong Tea', 'Ô long cùng cam xoài mát lạnh.', { M: 60, L: 65 }, standardTeaOptions),
+    ],
+  },
+  {
+    id: 'milk-tea',
+    name: 'TRÀ SỮA',
+    sideLabel: 'SMOOTH BOOST',
+    theme: 'light',
+    products: [
+      product('milk-tea', 'hong-tra-shan-tuyet', 'Hồng Trà Shan Tuyết', 'Snowshan Black Tea', 'Hồng trà núi, vị trà rõ và sâu.', { M: 60, L: 65 }, standardTeaOptions),
+      product('milk-tea', 'o-long-nhai', 'Ô Long Nhài', 'Jasmine Oolong Tea', 'Ô long cùng hương nhài thanh.', { M: 60, L: 65 }, standardTeaOptions),
+      product('milk-tea', 'gao-rang-banh-bo', 'Gạo Rang Bánh Bò', 'Honeycomb Rice Tea', 'Gạo rang thơm, ngọt nhẹ.', { M: 60, L: 65 }, standardTeaOptions),
+      product('milk-tea', 'o-long-tu-quy', 'Ô Long Tứ Quý', 'Four Seasons Oolong', 'Ô long bốn mùa cân bằng.', { M: 60, L: 65 }, standardTeaOptions),
+      product('milk-tea', 'gao-rang', 'Gạo Rang', 'Roasted Rice Milk Tea', 'Gạo rang ấm, trà sữa dịu.', { M: 60, L: 65 }, standardTeaOptions),
+      product('milk-tea', 'hoa-vai', 'Hoa Vải', 'Floral Lychee Tea', 'Vải thiều và hương hoa nhẹ.', { M: 60, L: 65 }, standardTeaOptions),
+    ],
+  },
+  {
+    id: 'coffee',
+    name: 'CÀ PHÊ',
+    sideLabel: 'BOLD KICK',
+    theme: 'dark',
+    products: [
+      product('coffee', 'ca-phe-den', 'Cà Phê Đen', 'Black Coffee', 'Pha phin, đậm và thẳng.', { M: 45, L: 50 }, icedOptions),
+      product('coffee', 'americano', 'Americano', 'Americano', 'Espresso loãng, sáng vị.', { M: 50, L: 55 }, icedOptions),
+      product('coffee', 'ca-phe-nau', 'Cà Phê Nâu', 'Vietnamese Brown Coffee', 'Cà phê cùng sữa đặc truyền thống.', { M: 50, L: 55 }, icedOptions),
+      product('coffee', 'bac-xiu', 'Bạc Xỉu', 'Vietnamese White Coffee', 'Nhiều sữa, ít cà phê.', { M: 55, L: 60 }, icedOptions),
+      product('coffee', 'khoi', 'Khói', 'Smoky Coffee', 'Hương khói nhẹ trên nền cà phê.', { M: 60, L: 65 }, icedOptions),
+      product('coffee', 'latte', 'Latte', 'Latte', 'Espresso và sữa cân bằng.', { M: 60, L: 65 }, icedOptions),
+      product('coffee', 'ca-phe-muoi', 'Cà Phê Muối', 'Salted Cream Coffee', 'Kem muối trên cà phê đen.', { M: 60, L: 65 }, icedOptions),
+    ],
+  },
+  {
+    id: 'coldbrew',
+    name: 'COLDBREW',
+    sideLabel: 'FUEL YOUR HUSTLE',
+    theme: 'light',
+    products: [
+      product('coldbrew', 'coldbrew-chanh', 'Cold Brew Chanh', 'Lemon Cold Brew', 'Cold brew cùng chanh tươi.', { M: 60, L: 65 }, icedOptions),
+      product('coldbrew', 'coldbrew-dao', 'Cold Brew Đào', 'Peach Cold Brew', 'Cold brew cùng đào thanh.', { M: 60, L: 65 }, icedOptions),
+      product('coldbrew', 'coldbrew-qua-mong', 'Cold Brew Quả Mọng', 'Berry Cold Brew', 'Quả mọng trên nền cà phê lạnh.', { M: 60, L: 65 }, icedOptions),
+      product('coldbrew', 'coldbrew-mo', 'Cold Brew Mơ', 'Apricot Cold Brew', 'Mơ thơm, hậu vị sáng.', { M: 60, L: 65 }, icedOptions),
     ],
   },
   {
     id: 'freeze',
-    name: 'FREEZE ĐÁ XAY',
-    rail: 'REFRESH YOURSELF',
-    statement: 'Nạp lạnh. Làm tiếp.',
-    tone: 'ink',
-    layout: 'four',
-    items: [
-      item('coffee-freeze', 'Cà Phê', 'Coffee Freeze', '65 / 70', 'Cà phê xay đá, đậm vị.'),
-      item('matcha-freeze', 'Matcha', 'Matcha Freeze', '65 / 70', 'Matcha Nhật xay mịn.'),
-      item('chocomint-freeze', 'Chocomint', 'Chocomint Freeze', '65 / 70', 'Sô cô la và bạc hà lạnh.'),
-      item('xoai-chanh-leo-freeze', 'Xoài Chanh Leo', 'Mango & Passion Fruit Freeze', '65 / 70', 'Xoài chanh leo tươi xay.'),
+    name: 'FREEZE',
+    sideLabel: 'COOL DOWN',
+    theme: 'dark',
+    products: [
+      product('freeze', 'coffee-freeze', 'Cà Phê Đá Xay', 'Coffee Freeze', 'Cà phê xay đá, đậm vị.', { M: 65, L: 70 }, icedOptions),
+      product('freeze', 'matcha-freeze', 'Matcha Đá Xay', 'Matcha Freeze', 'Matcha xay mịn và lạnh.', { M: 65, L: 70 }, icedOptions),
+      product('freeze', 'chocomint-freeze', 'Chocomint Đá Xay', 'Chocomint Freeze', 'Sô cô la cùng bạc hà lạnh.', { M: 65, L: 70 }, icedOptions),
+      product('freeze', 'xoai-chanh-leo-freeze', 'Xoài Chanh Leo Đá Xay', 'Mango Passion Fruit Freeze', 'Xoài chanh leo tươi xay.', { M: 65, L: 70 }, icedOptions),
     ],
   },
   {
-    id: 'matcha',
-    name: 'MATCHA',
-    rail: 'NON-CAFFEIN',
-    statement: 'Xanh, đậm, không cần vội.',
-    tone: 'paper',
-    layout: 'three',
-    items: [
-      item('matcha-kem-muoi', 'Matcha Kem Muối', 'Salted Cream Matcha', '55 / 65', 'Matcha và lớp kem muối.'),
-      item('matcha-da-xay-kem-dua', 'Matcha Đá Xay Kem Dừa', 'Freeze Coconut Matcha', '60 / 70', 'Matcha xay với kem dừa.'),
-      item('matcha-latte-sua-bo', 'Matcha Latte Sữa Bò', 'Matcha Latte (Dairy Milk)', '65 / 75', 'Matcha latte sữa bò.'),
-      item('matcha-latte-sua-hat', 'Matcha Latte Sữa Hạt', 'Matcha Latte (Oatmilk)', '65 / 75', 'Matcha latte sữa yến mạch.'),
-      item('matcha-mo', 'Matcha Mơ', 'Apricot Matcha', '65 / 75', 'Matcha hòa vị mơ nhẹ.'),
+    id: 'fruit-water',
+    name: 'NƯỚC HOA QUẢ',
+    sideLabel: 'BRIGHT BREAK',
+    theme: 'light',
+    products: [
+      product('fruit-water', 'cam-dao', 'Cam Đào', 'Orange Peach', 'Cam và đào, uống lạnh.', { M: 60, L: 65 }, standardTeaOptions),
+      product('fruit-water', 'chanh-dua', 'Chanh Dứa', 'Passion Fruit Pineapple', 'Chanh leo và dứa tươi.', { M: 60, L: 65 }, standardTeaOptions),
+      product('fruit-water', 'dao-oi-hong', 'Đào Ổi Hồng', 'Peach Pink Guava', 'Đào cùng ổi hồng tươi.', { M: 60, L: 65 }, standardTeaOptions),
+    ],
+  },
+  {
+    id: 'topping',
+    name: 'TOPPING',
+    sideLabel: 'MAKE IT YOURS',
+    theme: 'dark',
+    products: [
+      product('topping', 'tran-chau-den', 'Trân Châu Đen', 'Black Pearl', 'Trân châu đen dai vừa.', { M: 5 }, {}, ['topping']),
+      product('topping', 'tran-chau-trang', 'Trân Châu Trắng', 'White Pearl', 'Trân châu trắng mềm hơn.', { M: 5 }, {}, ['topping']),
+      product('topping', 'thach-dao', 'Thạch Đào', 'Peach Jelly', 'Thạch đào mềm, nhẹ vị.', { M: 5 }, {}, ['topping']),
     ],
   },
 ]
 
-export const MENU_TABS = MENU_CATEGORIES.map((category) => ({
-  id: category.id,
-  label: category.name,
-}))
-
+export const MENU_TABS = MENU_CATEGORIES.map((category) => ({ id: category.id, label: category.name }))
 export const MENU_SOURCE_STATUS = 'pending' as const

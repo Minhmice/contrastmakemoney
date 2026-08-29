@@ -538,6 +538,18 @@
   transform: scale(0.985);
 }
 
+.profile-logout:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.profile-logout-error {
+  max-width: 260px;
+  margin: 0 0 8px;
+  color: var(--paper);
+  font-size: 12px;
+}
+
 .profile-footer {
   display: flex;
   align-items: center;

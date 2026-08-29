@@ -11,10 +11,6 @@ const FOCUS_STEPS = [
 export function FocusInterludeSection() {
   return (
     <section className="focus-interlude section-dark">
-      <div className="focus-interlude__label">
-        <span>07 — 11</span>
-        <span>FOCUS INTERLUDE</span>
-      </div>
       <div className="focus-interlude__steps">
         {FOCUS_STEPS.map((step, index) => (
           <div className="focus-step" key={step}>

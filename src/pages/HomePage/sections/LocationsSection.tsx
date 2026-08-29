@@ -1,6 +1,5 @@
 import type { RefObject } from 'react'
 import { ArrowUpRight, MapPin, MoveUpRight } from 'lucide-react'
-import { SectionLabel } from '@/components/shared/SectionLabel'
 import { LOCATIONS, type Location } from '@/data/locations'
 
 type LocationsSectionProps = {
@@ -23,10 +22,6 @@ export function LocationsSection({
 
   return (
     <section className="locations-section" id="locations" ref={locationsRef}>
-      <div className="locations-section__top">
-        <SectionLabel>CONTRAST GẦN BẠN</SectionLabel>
-        <span className="chapter-count">08 — 11</span>
-      </div>
       <div className="locations-section__heading">
         <h2>
           HÔM NAY
@@ -34,9 +29,9 @@ export function LocationsSection({
           <span>NGỒI ĐÂU?</span>
         </h2>
         <p>
-          Mỗi cơ sở có không gian và nhịp riêng.
+          Mỗi cơ sở có một nhịp riêng để bạn tập trung.
           <br />
-          Chọn nơi phù hợp với buổi học hoặc làm việc hôm nay.
+          Chọn nơi hợp với việc cần làm hôm nay.
         </p>
       </div>
       <div className="locations-layout">

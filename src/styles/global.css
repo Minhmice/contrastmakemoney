@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import '@fontsource-variable/geist';
+@import '../staff-checkin.css';
 
 :root {
   --paper: #f1f0eb;
@@ -123,32 +124,64 @@ a {
 }
 
 .button {
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 16px;
   min-height: 48px;
+  overflow: hidden;
   padding: 0 18px 0 20px;
   font-size: 11px;
   font-weight: 750;
   letter-spacing: 0.12em;
   transition:
-    transform 180ms var(--ease-out),
+    transform 140ms var(--ease-out),
     background-color 180ms var(--ease-out),
     color 180ms var(--ease-out);
 }
 
-.button svg,
-.arrow-link svg,
-.text-link svg,
-.location-all svg {
+.button > * {
+  position: relative;
+  z-index: 1;
+}
+
+.button--red::before {
+  background: var(--paper);
+}
+
+.button--dark::before {
+  background: var(--paper);
+}
+
+.button--white::before {
+  background: var(--red);
+}
+
+.button::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: var(--paper);
+  content: '';
+  transform: translateX(-102%);
+  transition: transform 260ms var(--ease-out);
+}
+
+.button:focus-visible::before {
+  transform: translateX(0);
+}
+
+.button:focus-visible {
+  color: var(--ink);
+}
+
+.button svg {
   transition: transform 180ms var(--ease-out);
 }
 
-.button:hover svg,
-.arrow-link:hover svg,
-.text-link:hover svg,
-.location-all:hover svg {
+.button:focus-visible svg {
   transform: translate(3px, -3px);
 }
 
@@ -157,7 +190,7 @@ a {
 }
 
 .button--red {
-  background: var(--red);
+  background: var(--red-dark);
   color: var(--paper);
 }
 
@@ -190,14 +223,41 @@ a {
   *::after {
     transition-duration: 0.01ms !important;
   }
+
+  .button::before,
+  .text-link__icon-face,
+  .text-link__line-face,
+  .arrow-link__icon-face,
+  .arrow-link__line-face {
+    transition: none !important;
+  }
+
+  .button::before {
+    transform: translateX(-102%);
+  }
+
+  .text-link__icon-face,
+  .text-link__line-face,
+  .text-link__icon-face--clone,
+  .text-link__line-face--clone,
+  .arrow-link__icon-face,
+  .arrow-link__line-face,
+  .arrow-link__icon-face--clone,
+  .arrow-link__line-face--clone {
+    transform: none;
+  }
 }
 
 .button--white:hover {
-  background: var(--red);
-  color: var(--paper);
+  background: var(--paper);
+  color: var(--ink);
 }
 
-.text-link {
+.text-link,
+.arrow-link {
+  --link-duration: 320ms;
+  --link-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 9px;
@@ -208,28 +268,33 @@ a {
   letter-spacing: 0.12em;
 }
 
-.text-link--light {
+.text-link--light,
+.arrow-link--light {
   color: var(--paper);
 }
 
-.arrow-link {
+.text-link__content,
+.arrow-link__content {
   display: inline-flex;
   align-items: center;
-  gap: 14px;
-  min-height: 44px;
-  color: var(--ink);
-  font-size: 11px;
-  font-weight: 760;
-  letter-spacing: 0.13em;
+  gap: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid currentColor;
+  transition:
+    color 180ms var(--ease-out),
+    border-color 180ms var(--ease-out);
 }
 
-.arrow-link__icon {
-  display: inline-grid;
-  width: 28px;
-  height: 28px;
-  place-items: center;
-  border: 1px solid currentColor;
-  border-radius: 50%;
+.text-link:hover .text-link__content,
+.text-link:focus-visible .text-link__content,
+.arrow-link:hover .arrow-link__content,
+.arrow-link:focus-visible .arrow-link__content {
+  color: var(--red);
+}
+.arrow-link {
+  gap: 14px;
+  font-weight: 760;
+  letter-spacing: 0.13em;
 }
 
 .brand-logo {

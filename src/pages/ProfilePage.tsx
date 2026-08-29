@@ -1,44 +1,46 @@
-import { useMemo, useState } from 'react'
-import {
-  ArrowLeft,
-  ArrowUpRight,
-  CalendarDays,
-  Check,
-  LogOut,
-  MapPin,
-  UserRound,
-} from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import type { User } from '@supabase/supabase-js'
+import { ArrowLeft, ArrowUpRight, CalendarDays, LogOut, UserRound } from 'lucide-react'
 import { ContrastLogo } from '@/components/brand/ContrastLogo'
 import { AttendanceCalendar } from '@/components/attendance/AttendanceCalendar'
 import { AttendanceStreak } from '@/components/attendance/AttendanceStreak'
 import { toDateKey } from '@/features/attendance/date'
-import { calculateCurrentStreak } from '@/features/attendance/streak'
-import { loadAttendance } from '@/features/attendance/storage'
+import type { AttendanceRecord } from '@/features/attendance/types'
+import { loadAttendanceRecords, loadUserStats, type UserStats } from '@/features/user-data/api'
+import { migrateLocalAttendance } from '@/features/user-data/migration'
+import { supabase } from '@/lib/supabase'
 
-const PROFILE_NAME = 'Nguyễn Minh'
-const PROFILE_EMAIL = 'ban@email.com'
-const DEMO_ATTENDANCE_DATES = [-4, -3, -2, -1, 0]
 
-export default function ProfilePage() {
-  const [signedOut, setSignedOut] = useState(false)
-  const [records] = useState(loadAttendance)
+export default function ProfilePage({ user }: { user: User | null }) {
+  const email = user?.email ?? ''
+  const profileName = typeof user?.user_metadata.full_name === 'string' && user.user_metadata.full_name.trim()
+    ? user.user_metadata.full_name.trim()
+    : email.split('@')[0] || 'Thành viên'
+  const initials = profileName.split(/\s+/).slice(-2).map((part) => part[0]).join('').toUpperCase()
+  const [logoutPending, setLogoutPending] = useState(false)
+  const [logoutError, setLogoutError] = useState('')
+  const [records, setRecords] = useState<AttendanceRecord[]>([])
+  const [stats, setStats] = useState<UserStats>({ attendance_count: 0, current_streak: 0, drink_order_count: 0, completed_focus_count: 0 })
+  const [dataError, setDataError] = useState('')
+  useEffect(() => { migrateLocalAttendance().then(() => Promise.all([loadAttendanceRecords(), loadUserStats()])).then(([nextRecords, nextStats]) => { setRecords(nextRecords); setStats(nextStats) }).catch((cause) => setDataError(cause instanceof Error ? cause.message : 'Không thể tải dữ liệu hồ sơ.')) }, [])
   const today = toDateKey()
-  const attendanceDates = useMemo(() => {
-    const dates = new Set(records.map((record) => record.date))
-    if (dates.size === 0) {
-      DEMO_ATTENDANCE_DATES.forEach((delta) => {
-        const date = new Date()
-        date.setDate(date.getDate() + delta)
-        dates.add(toDateKey(date))
-      })
-    }
-    return dates
-  }, [records])
-  const streak = calculateCurrentStreak(attendanceDates)
+  const attendanceDates = useMemo(() => new Set(records.map((record) => record.date)), [records])
+  const streak = stats.current_streak
   const hasAttendedToday = attendanceDates.has(today)
 
-  if (signedOut) {
-    return <SignedOutState onReturn={() => (window.location.href = '/auth')} />
+  if (!user) return null
+
+  const signOut = async () => {
+    if (logoutPending) return
+    setLogoutPending(true)
+    setLogoutError('')
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      setLogoutError('Không thể đăng xuất. Vui lòng thử lại.')
+      setLogoutPending(false)
+      return
+    }
+    window.location.replace('/auth')
   }
 
   return (
@@ -65,7 +67,7 @@ export default function ProfilePage() {
         <div>
           <p className="section-label">CONTRAST / MEMBER 01</p>
           <h1 id="profile-title">
-            CHÀO, <span>{PROFILE_NAME.toUpperCase()}.</span>
+            CHÀO, <span>{profileName.toUpperCase()}.</span>
           </h1>
           <p className="profile-hero__lede">
             Một nơi để nhìn lại những ngày bạn đã ngồi xuống, bắt đầu và làm tiếp.
@@ -80,18 +82,18 @@ export default function ProfilePage() {
       <section className="profile-overview" aria-label="Tổng quan tài khoản">
         <div className="profile-identity">
           <div className="profile-avatar" aria-hidden="true">
-            NM
+            {initials}
           </div>
           <div>
             <span className="profile-eyebrow">THÀNH VIÊN CONTRAST</span>
-            <h2>{PROFILE_NAME}</h2>
-            <p>{PROFILE_EMAIL}</p>
+            <h2>{profileName}</h2>
+            <p>{email}</p>
           </div>
         </div>
         <div className="profile-stats">
           <div>
             <span>NGÀY ĐÃ ĐIỂM DANH</span>
-            <strong>{attendanceDates.size}</strong>
+            <strong>{stats.attendance_count}</strong>
           </div>
           <div>
             <span>CHUỖI HIỆN TẠI</span>
@@ -104,6 +106,7 @@ export default function ProfilePage() {
         </div>
       </section>
 
+      {dataError ? <p className="profile-logout-error" role="alert">{dataError}</p> : null}
       <div className="profile-content">
         <AttendanceCalendar attendanceDates={attendanceDates} />
         <div className="profile-side-column">
@@ -115,7 +118,7 @@ export default function ProfilePage() {
             <div>
               <p className="profile-eyebrow">NEXT PRACTICE</p>
               <h2 id="next-step-title">GIỮ NHỊP NGÀY MAI.</h2>
-              <p>Quay lại Contrast, chọn chỗ ngồi và thêm một dấu vào lịch.</p>
+              <p>{stats.drink_order_count} đồ uống đã order · {stats.completed_focus_count} phiên focus hoàn tất.</p>
               <a href="/#locations">
                 TÌM CƠ SỞ <ArrowUpRight size={15} strokeWidth={1.8} aria-hidden="true" />
               </a>
@@ -129,9 +132,12 @@ export default function ProfilePage() {
           <span className="profile-eyebrow">ACCOUNT / SESSION</span>
           <h2>ĐẾN RỒI THÌ Ở LẠI VỚI VIỆC.</h2>
         </div>
-        <button type="button" className="profile-logout" onClick={() => setSignedOut(true)}>
-          <LogOut size={17} strokeWidth={1.8} aria-hidden="true" /> ĐĂNG XUẤT
-        </button>
+        <div>
+          {logoutError ? <p className="profile-logout-error" role="alert">{logoutError}</p> : null}
+          <button type="button" className="profile-logout" disabled={logoutPending} onClick={signOut}>
+            <LogOut size={17} strokeWidth={1.8} aria-hidden="true" /> {logoutPending ? 'ĐANG ĐĂNG XUẤT...' : 'ĐĂNG XUẤT'}
+          </button>
+        </div>
       </section>
 
       <footer className="profile-footer">
@@ -143,23 +149,6 @@ export default function ProfilePage() {
           <ArrowLeft size={15} strokeWidth={1.8} aria-hidden="true" /> TRANG CHỦ
         </a>
       </footer>
-    </main>
-  )
-}
-
-function SignedOutState({ onReturn }: { onReturn: () => void }) {
-  return (
-    <main className="profile-signed-out">
-      <div className="profile-signed-out__mark">
-        <Check size={28} strokeWidth={1.7} aria-hidden="true" />
-      </div>
-      <p className="section-label">CONTRAST / SESSION CLOSED</p>
-      <h1>ĐÃ ĐĂNG XUẤT.</h1>
-      <p>Phiên làm việc đã kết thúc. Quay lại màn hình đăng nhập để tiếp tục.</p>
-      <button type="button" className="button button--red" onClick={onReturn}>
-        VỀ MÀN HÌNH LOGIN <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
-      </button>
-      <MapPin className="profile-signed-out__line" size={18} strokeWidth={1.5} aria-hidden="true" />
     </main>
   )
 }

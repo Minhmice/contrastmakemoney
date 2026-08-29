@@ -1,10 +1,6 @@
 export function CampaignSection() {
   return (
     <section className="campaign section-red">
-      <div className="campaign__meta">
-        <span>09 — 11</span>
-        <span>FROM CONTRAST</span>
-      </div>
       <div className="campaign__content">
         <p className="campaign__small">CONTRAST / CAMPAIGN WALL</p>
         <h2>
