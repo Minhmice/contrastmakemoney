@@ -11,6 +11,7 @@
     "start": "next start",
     "optimize:texture": "node scripts/optimize-texture.mjs",
     "optimize:loading": "node scripts/optimize-loading-images.mjs",
+    "optimize:menu": "node scripts/optimize-menu-images.mjs",
     "generate:noise": "node scripts/generate-noise.mjs",
     "smoke:auth": "node --env-file=.env scripts/smoke-auth.mjs",
     "smoke:loading": "node --experimental-strip-types src/components/loading/self-check.ts",

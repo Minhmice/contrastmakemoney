@@ -45,22 +45,22 @@ const standardTeaOptions: MenuOptions = {
 
 
 const productImages: Record<string, readonly [string, string]> = {
-  'matcha-kem-muoi': ['/images/Matcha Kem Muối/Iced Salted Cream Matcha.png', '/images/Matcha Kem Muối/Salted Cream Matcha Study Desk.png'],
-  'matcha-da-xay-kem-dua': ['/images/Matcha Đá Xay Kem Dừa/Freeze Coconut Matcha Drink Cutout.png', '/images/Matcha Đá Xay Kem Dừa/Freeze Coconut Matcha on a Study Desk.png'],
-  'tra-quat-hong-bi': ['/images/Trà Quất Hồng Bì/0041.png', '/images/Trà Quất Hồng Bì/0040.png'],
-  'tra-hoa-qua-nhiet-doi': ['/images/Trà Hoa Quả Nhiệt Đới/0038.png', '/images/Trà Hoa Quả Nhiệt Đới/0037.png'],
-  'o-long-sen-luu': ['/images/Ô Long Sen Lựu/0035.png', '/images/Ô Long Sen Lựu/0034.png'],
-  'o-long-cam-xoai': ['/images/Ô Long Cam Xoài/0032.png', '/images/Ô Long Cam Xoài/0031.png'],
-  'hong-tra-shan-tuyet': ['/images/Hồng Trà Shan Tuyết/0014.png', '/images/Hồng Trà Shan Tuyết/0013.png'],
-  'hoa-vai': ['/images/Hoa Vải/0016.png', '/images/Hoa Vải/0012.png'],
-  'coffee-freeze': ['/images/Coffee Freeze/0026.png', '/images/Coffee Freeze/0025.png'],
-  'matcha-freeze': ['/images/Matcha Freeze/Matcha Freeze Product Cutout.png', '/images/Matcha Freeze/Matcha Freeze on a Warm Study Desk.png'],
-  'chocomint-freeze': ['/images/Chocomint/Chocomint Freeze Product Cutout.png', '/images/Chocomint/Chocomint freeze on a modern study desk.png'],
-  'xoai-chanh-leo-freeze': ['/images/Xoài Chanh Leo/Mango passion fruit freeze cutout.png', '/images/Xoài Chanh Leo/Mango Passion Fruit Freeze on a Desk.png'],
-  'cam-dao': ['/images/Cam Đào/0011.png', '/images/Cam Đào/0015.png'],
-  'chanh-dua': ['/images/Chanh Dứa/0010.png', '/images/Chanh Dứa/0001.png'],
-  'tran-chau-den': ['/images/Trân Châu Đen/0048.png', '/images/Trân Châu Đen/0047.png'],
-  'tran-chau-trang': ['/images/Trân Châu Trắng/0045.png', '/images/Trân Châu Trắng/0044.png'],
+  'matcha-kem-muoi': ['/images/Matcha Kem Muối/Iced Salted Cream Matcha.webp', '/images/Matcha Kem Muối/Salted Cream Matcha Study Desk.webp'],
+  'matcha-da-xay-kem-dua': ['/images/Matcha Đá Xay Kem Dừa/Freeze Coconut Matcha Drink Cutout.webp', '/images/Matcha Đá Xay Kem Dừa/Freeze Coconut Matcha on a Study Desk.webp'],
+  'tra-quat-hong-bi': ['/images/Trà Quất Hồng Bì/0041.webp', '/images/Trà Quất Hồng Bì/0040.webp'],
+  'tra-hoa-qua-nhiet-doi': ['/images/Trà Hoa Quả Nhiệt Đới/0038.webp', '/images/Trà Hoa Quả Nhiệt Đới/0037.webp'],
+  'o-long-sen-luu': ['/images/Ô Long Sen Lựu/0035.webp', '/images/Ô Long Sen Lựu/0034.webp'],
+  'o-long-cam-xoai': ['/images/Ô Long Cam Xoài/0032.webp', '/images/Ô Long Cam Xoài/0031.webp'],
+  'hong-tra-shan-tuyet': ['/images/Hồng Trà Shan Tuyết/0014.webp', '/images/Hồng Trà Shan Tuyết/0013.webp'],
+  'hoa-vai': ['/images/Hoa Vải/0016.webp', '/images/Hoa Vải/0012.webp'],
+  'coffee-freeze': ['/images/Coffee Freeze/0026.webp', '/images/Coffee Freeze/0025.webp'],
+  'matcha-freeze': ['/images/Matcha Freeze/Matcha Freeze Product Cutout.webp', '/images/Matcha Freeze/Matcha Freeze on a Warm Study Desk.webp'],
+  'chocomint-freeze': ['/images/Chocomint/Chocomint Freeze Product Cutout.webp', '/images/Chocomint/Chocomint freeze on a modern study desk.webp'],
+  'xoai-chanh-leo-freeze': ['/images/Xoài Chanh Leo/Mango passion fruit freeze cutout.webp', '/images/Xoài Chanh Leo/Mango Passion Fruit Freeze on a Desk.webp'],
+  'cam-dao': ['/images/Cam Đào/0011.webp', '/images/Cam Đào/0015.webp'],
+  'chanh-dua': ['/images/Chanh Dứa/0010.webp', '/images/Chanh Dứa/0001.webp'],
+  'tran-chau-den': ['/images/Trân Châu Đen/0048.webp', '/images/Trân Châu Đen/0047.webp'],
+  'tran-chau-trang': ['/images/Trân Châu Trắng/0045.webp', '/images/Trân Châu Trắng/0044.webp'],
 }
 
 const icedOptions: MenuOptions = {
