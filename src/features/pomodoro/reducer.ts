@@ -1,5 +1,5 @@
-import { getPhaseDurationSeconds, isValidDurationMinutes, minutesToSeconds } from './timer.ts'
-import type { PomodoroAction, PomodoroPhase, PomodoroSettings, PomodoroState } from './types.ts'
+import { getPhaseDurationSeconds, isValidDurationMinutes, minutesToSeconds } from './timer'
+import type { PomodoroAction, PomodoroPhase, PomodoroSettings, PomodoroState } from './types'
 
 export const DEFAULT_POMODORO_SETTINGS: PomodoroSettings = {
   workMinutes: 25,
@@ -53,6 +53,15 @@ export function pomodoroReducer(state: PomodoroState, action: PomodoroAction): P
     case 'START':
       if (state.status === 'running' || state.remainingSeconds <= 0) return state
       return { ...state, status: 'running', endsAt: action.now + state.remainingSeconds * 1000 }
+    case 'PAUSE': {
+      if (state.status !== 'running' || state.endsAt === null) return state
+      return {
+        ...state,
+        status: 'idle',
+        remainingSeconds: Math.max(0, Math.ceil((state.endsAt - action.now) / 1000)),
+        endsAt: null,
+      }
+    }
     case 'TICK': {
       if (state.status !== 'running' || state.endsAt === null) return state
       const remainingSeconds = Math.max(0, Math.ceil((state.endsAt - action.now) / 1000))

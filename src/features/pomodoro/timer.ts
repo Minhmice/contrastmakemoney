@@ -1,4 +1,4 @@
-import type { PomodoroPhase, PomodoroSettings } from './types.ts'
+import type { PomodoroPhase, PomodoroSettings } from './types'
 
 export const MIN_DURATION_MINUTES = 1
 export const MAX_DURATION_MINUTES = 120

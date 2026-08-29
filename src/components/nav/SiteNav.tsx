@@ -4,6 +4,8 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ArrowUpRight, Menu as MenuIcon, UserRound, X } from 'lucide-react'
 import { ContrastLogo } from '@/components/brand/ContrastLogo'
+import { PublicActionLink } from '@/components/wrappers/PublicAction'
+import { useAuth } from '@/app/auth-context'
 import { setScrollLocked } from '@/lib/scroll-lock'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -19,8 +21,7 @@ type NavItem = {
 }
 
 const NAV_ITEMS: readonly NavItem[] = [
-  { key: 'space', label: 'KHÔNG GIAN', href: '/#space', spyTarget: '#space' },
-  { key: 'workspace', label: 'WORKSPACE', href: '/workspace' },
+  { key: 'space', label: 'KHÔNG GIAN', href: '/space' },
   { key: 'menu', label: 'MENU', href: '/menu', spyTarget: '#menu' },
   { key: 'locations', label: 'CƠ SỞ', href: '/#locations', spyTarget: '#locations' },
 ]
@@ -33,6 +34,8 @@ type SiteNavProps = {
 }
 
 export function SiteNav({ current, spy = false }: SiteNavProps) {
+  const user = useAuth()
+  const workspaceHref = '/workspace'
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [readingKey, setReadingKey] = useState<NavKey | undefined>(undefined)
 
@@ -70,7 +73,11 @@ export function SiteNav({ current, spy = false }: SiteNavProps) {
     <Dialog.Root open={drawerOpen} onOpenChange={setDrawerOpen} modal>
       <header className="site-nav">
         <div className="site-nav__inner">
-          <a className="site-nav__brand" href="/" aria-label="Contrast Coffee, về trang chủ">
+          <a
+            className="site-nav__brand"
+            href="/"
+            aria-label="Contrast Coffee, về trang chủ"
+          >
             <ContrastLogo variant="wordmark-dark" className="site-nav__logo" />
           </a>
 
@@ -90,15 +97,22 @@ export function SiteNav({ current, spy = false }: SiteNavProps) {
               ))}
             </nav>
 
-            <a className="site-nav__profile" href="/profile">
-              <UserRound size={17} strokeWidth={1.7} aria-hidden="true" />
-              HỒ SƠ
-            </a>
-
-            <Dialog.Trigger
-              className="site-nav__toggle"
-              aria-label="Mở điều hướng"
+            <PublicActionLink
+              className="site-nav__workspace"
+              href={workspaceHref}
+              size="nav"
+              aria-current={current === 'workspace' ? 'page' : undefined}
             >
+              WORKSPACE
+            </PublicActionLink>
+
+            {user ? (
+              <a className="site-nav__profile" href="/profile" aria-label="Hồ sơ cá nhân">
+                <UserRound size={17} strokeWidth={1.7} aria-hidden="true" />
+              </a>
+            ) : null}
+
+            <Dialog.Trigger className="site-nav__toggle" aria-label="Mở điều hướng">
               <MenuIcon size={22} strokeWidth={1.6} aria-hidden="true" />
             </Dialog.Trigger>
           </div>
@@ -107,7 +121,9 @@ export function SiteNav({ current, spy = false }: SiteNavProps) {
 
       <Dialog.Portal>
         <Dialog.Popup className="nav-drawer">
-          <Dialog.Title className="nav-drawer__title">Điều hướng Contrast Coffee</Dialog.Title>
+          <Dialog.Title className="nav-drawer__title">
+            Điều hướng Contrast Coffee
+          </Dialog.Title>
 
           <Dialog.Close className="nav-drawer__close" aria-label="Đóng điều hướng">
             <X size={22} strokeWidth={1.6} aria-hidden="true" />
@@ -126,13 +142,24 @@ export function SiteNav({ current, spy = false }: SiteNavProps) {
               </a>
             ))}
             <a
-              className="nav-drawer__profile"
-              href="/profile"
+              className="nav-drawer__workspace"
+              href={workspaceHref}
+              aria-current={current === 'workspace' ? 'page' : undefined}
               onClick={() => setDrawerOpen(false)}
             >
-              HỒ SƠ CÁ NHÂN
-              <UserRound size={22} strokeWidth={1.4} aria-hidden="true" />
+              WORKSPACE
+              <ArrowUpRight size={22} strokeWidth={1.4} aria-hidden="true" />
             </a>
+            {user ? (
+              <a
+                className="nav-drawer__profile"
+                href="/profile"
+                onClick={() => setDrawerOpen(false)}
+              >
+                HỒ SƠ CÁ NHÂN
+                <UserRound size={22} strokeWidth={1.4} aria-hidden="true" />
+              </a>
+            ) : null}
           </nav>
 
           <div className="nav-drawer__foot">

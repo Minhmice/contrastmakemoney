@@ -28,6 +28,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# Next.js
+.next
+
 # Playwright
 test-results
 playwright-report

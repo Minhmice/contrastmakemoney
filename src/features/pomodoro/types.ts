@@ -21,6 +21,7 @@ export type PomodoroState = {
 
 export type PomodoroAction =
   | { type: 'START'; now: number }
+  | { type: 'PAUSE'; now: number }
   | { type: 'TICK'; now: number }
   | { type: 'RESET' }
   | { type: 'SKIP' }

@@ -76,6 +76,10 @@ Vietnamese diacritics must remain structurally correct at every scale, weight, c
 
 **The Semantic Clarity Rule.** Performative type may alter composition, not the visitor's ability to understand content or action.
 
+### Vietnamese Responsive Type
+
+Vietnamese diacritics are content, not decoration. Display type uses a minimum `line-height: 1.02` and tracking no tighter than `-0.04em`; body copy uses at least `1.4`. Headings balance; prose wraps naturally. Containers do not clip text to preserve a composition. Use `overflow-wrap: anywhere` only for unbounded names, URLs, or user content. `nowrap` requires a visible overflow strategy and is never default behavior for labels or buttons.
+
 ## Layout
 
 A grid provides underlying discipline, but not every element must visibly obey it at every moment. Layout may alternate between strict editorial grids, cinematic image fields, sparse paper structures, asymmetrical compositions, oversized typography, modular content systems, spatial overlaps, and controlled off-grid events.
@@ -91,6 +95,8 @@ The system creates and resolves tension intentionally. Responsive composition is
 **The Meaningful Modularity Rule.** Modular and bento-like compositions are welcome when hierarchy, scale, material, and behavior vary meaningfully. Avoid generic equal-card grids.
 
 Mobile is a recomposition, not a reduced desktop layout. Large gestures may become horizontal typography, shorter spatial sequences, touch-driven interactions, swipeable structures, simplified depth, alternate crops, or non-cursor behavior. Identity and action must survive when advanced interaction is unavailable.
+
+Every responsive change holds from 320px through desktop, at 200% zoom, with long Vietnamese copy and short viewports. Use intrinsic grid/flex sizing before fixed dimensions; every text-bearing grid/flex child may shrink. Intentional horizontal interaction, such as the menu ledger, stays inside its own viewport and never becomes document overflow.
 
 ## Elevation & Depth
 

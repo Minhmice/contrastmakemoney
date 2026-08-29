@@ -1,0 +1,16 @@
+---
+description: Require section-scoped motion workflow and GSAP skill stack for frontend animation work
+alwaysApply: true
+---
+
+# Animation skill gate
+
+For any request to add, change, review, debug, or polish frontend animation:
+
+- Load and follow section-motion-director before reading or editing animation code.
+- Work on one explicitly named section only. Ask for target when missing. Never animate whole page without explicit scope.
+- Load required stack named by that skill, including official GSAP core, React, ScrollTrigger, timeline, performance, animation, and design-craft guidance.
+- Use deterministic role-aware variation, not Math.random(); report seed and selected variants.
+- Keep motion early, short, reversible, responsive, scoped, cleaned up, and reduced-motion safe.
+- Do not use Superdesign CLI for code-only animation. Load superdesign only for requested canvas exploration or design variants.
+- Stop after one bounded verification pass and wait for section approval.

@@ -1,5 +1,5 @@
-import { createPomodoroState, pomodoroReducer } from './reducer.ts'
-import { getRingAngle, isValidDurationMinutes } from './timer.ts'
+import { createPomodoroState, pomodoroReducer } from './reducer'
+import { getDisplaySeconds, getRingAngle, isValidDurationMinutes } from './timer'
 
 const assert = (condition: boolean, message: string) => {
   if (!condition) throw new Error(message)
@@ -8,6 +8,11 @@ const assert = (condition: boolean, message: string) => {
 const state = createPomodoroState()
 const running = pomodoroReducer(state, { type: 'START', now: 1000 })
 assert(running.endsAt === 1_501_000, 'start uses remaining timestamp')
+const paused = pomodoroReducer(running, { type: 'PAUSE', now: 61_000 })
+assert(paused.status === 'idle' && paused.remainingSeconds === 1_440 && paused.endsAt === null, 'pause keeps remaining time')
+const resumed = pomodoroReducer(paused, { type: 'START', now: 61_000 })
+assert(resumed.endsAt === 1_501_000, 'resume keeps paused timestamp')
+assert(getDisplaySeconds(paused.remainingSeconds, paused.endsAt, 61_000) === paused.remainingSeconds, 'paused display stays stable')
 const shortBreak = pomodoroReducer(running, { type: 'TICK', now: 1_501_000 })
 assert(shortBreak.phase === 'shortBreak' && shortBreak.status === 'idle', 'work completes into stopped short break')
 const skipped = pomodoroReducer(state, { type: 'SKIP' })

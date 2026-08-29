@@ -1,0 +1,11 @@
+### Result
+"{\"viewport\":{\"w\":360,\"h\":732},\"detail\":false,\"visual\":\"3 / 4\",\"overflow\":360,\"scrollHeight\":10388}"
+### Ran Playwright code
+```js
+await page.evaluate('() => (JSON.stringify({viewport:{w:innerWidth,h:innerHeight},detail:!!document.querySelector(\'.menu-inline-detail\'),visual:getComputedStyle(document.querySelector(\'.menu-product-card__visual\')).aspectRatio,overflow:document.documentElement.scrollWidth,scrollHeight:document.body.scrollHeight}))');
+```
+### Page
+- Page URL: http://127.0.0.1:4173/menu
+- Page Title: Contrast Coffee — Kiên trì · Kỷ luật
+### Events
+- New console entries: .playwright-cli\console-2026-08-29T01-32-30-200Z.log#L2

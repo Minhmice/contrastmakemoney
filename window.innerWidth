@@ -1,0 +1,8 @@
+### Result
+"{\"w\":360,\"h\":732,\"detail\":false,\"visual\":\"3 / 4\",\"overflow\":360,\"body\":10388}"
+### Ran Playwright code
+```js
+await page.evaluate('() => (JSON.stringify({w:window.innerWidth,h:window.innerHeight,detail:Boolean(document.querySelector(\'.menu-inline-detail\')),visual:getComputedStyle(document.querySelector(\'.menu-product-card__visual\')).aspectRatio,overflow:document.documentElement.scrollWidth,body:document.body.scrollHeight}))');
+```
+### Events
+- New console entries: .playwright-cli\console-2026-08-29T01-32-30-200Z.log#L3
