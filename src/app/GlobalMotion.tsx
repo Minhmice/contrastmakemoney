@@ -15,6 +15,8 @@ export default function GlobalMotion({ children }: { children: ReactNode }) {
     const root = rootRef.current
     if (!root) return
 
+    if (!window.matchMedia('(min-width: 768px)').matches) return
+
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const lenis = new Lenis({
       autoRaf: false,

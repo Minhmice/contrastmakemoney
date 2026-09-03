@@ -1,8 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useEffect, useState } from 'react'
 
 type TimeSlot = {
   period: string
@@ -43,7 +41,6 @@ function formatHanoiTime(date: Date, includeSeconds = true) {
 }
 
 export function TimeSection() {
-  const sectionRef = useRef<HTMLElement>(null)
   const [now, setNow] = useState<Date | null>(null)
   const activeSlot = now ? getActiveSlot(getHanoiHour(now)) : null
 
@@ -60,54 +57,9 @@ export function TimeSection() {
     }
   }, [])
 
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger)
-    const section = sectionRef.current
-    if (!section) return
-
-    const media = gsap.matchMedia()
-    media.add('(prefers-reduced-motion: no-preference)', () => {
-      const context = gsap.context(() => {
-        gsap.fromTo(
-          '.time-stage__line',
-          { yPercent: 105, autoAlpha: 0 },
-          {
-            yPercent: 0,
-            autoAlpha: 1,
-            duration: 0.8,
-            stagger: 0.08,
-            ease: 'power3.out',
-            scrollTrigger: { trigger: section, start: 'top 72%', once: true },
-          },
-        )
-
-        gsap.fromTo(
-          '.time-stage__clock, .time-ruler',
-          { y: 48, autoAlpha: 0 },
-          {
-            y: 0,
-            autoAlpha: 1,
-            duration: 0.72,
-            stagger: 0.1,
-            ease: 'power3.out',
-            scrollTrigger: { trigger: section, start: 'top 62%', once: true },
-          },
-        )
-
-        gsap.to('.time-stage__red-field', {
-          yPercent: -12,
-          ease: 'none',
-          scrollTrigger: { trigger: section, start: 'top bottom', end: 'bottom top', scrub: 0.8 },
-        })
-      }, section)
-      return () => context.revert()
-    })
-
-    return () => media.revert()
-  }, [])
 
   return (
-    <section ref={sectionRef} className="time-section" id="time" aria-labelledby="time-title">
+    <section className="time-section" id="time" aria-labelledby="time-title">
       <div className="time-stage">
         <div className="time-stage__red-field" aria-hidden="true" />
         <div className="time-stage__heading">

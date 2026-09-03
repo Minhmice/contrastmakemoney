@@ -4,7 +4,8 @@ import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { PublicActionLink } from '@/components/wrappers/PublicAction'
-import { HOME_MENU_FEATURES, type HomeMenuItem } from '@/legacy-pages/HomePage/data'
+import { HOME_MENU_FEATURES, type HomeMenuItem } from '@/components/home/data'
+import { MOTION } from '@/lib/motion'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -16,12 +17,15 @@ export function MenuPreviewSection({ items = HOME_MENU_FEATURES }: MenuPreviewSe
 
   useEffect(() => {
     const root = rootRef.current
-    if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (
+      !root ||
+      !window.matchMedia('(min-width: 768px) and (prefers-reduced-motion: no-preference)').matches
+    ) return
 
     const context = gsap.context(() => {
       gsap.timeline({
         defaults: { ease: 'none' },
-        scrollTrigger: { trigger: root, start: 'top 92%', end: 'top 54%', scrub: 0.4 },
+        scrollTrigger: { trigger: root, ...MOTION.reveal },
       })
         .fromTo('[data-menu-motion="media"]', { xPercent: -6, y: 24, scale: 0.94, autoAlpha: 0 }, { xPercent: 0, y: 0, scale: 1, autoAlpha: 1 }, 0)
         .fromTo('[data-menu-motion="heading"]', { y: 18, autoAlpha: 0, filter: 'blur(6px)' }, { y: 0, autoAlpha: 1, filter: 'blur(0px)' }, 0.08)

@@ -4,6 +4,7 @@ import { useLayoutEffect, useRef } from 'react'
 import { PublicActionLink } from '@/components/wrappers/PublicAction'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { MOTION } from '@/lib/motion'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -24,18 +25,18 @@ export function FocusInterludeSection() {
 
     const steps = section.querySelectorAll('.focus-step')
     const media = gsap.matchMedia()
-    media.add('(prefers-reduced-motion: no-preference)', () => {
+    media.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
       gsap.fromTo(
         steps,
         { autoAlpha: 0, y: 40 },
         {
           autoAlpha: 1,
           y: 0,
-          duration: 0.7,
+          duration: MOTION.duration.reveal,
           ease: 'power3.out',
-          stagger: 0.1,
+          stagger: MOTION.duration.stagger,
           clearProps: 'transform,opacity,visibility',
-          scrollTrigger: { trigger: steps[0], start: 'top 90%', once: true },
+          scrollTrigger: { trigger: steps[0], start: MOTION.reveal.start, once: true },
         },
       )
     })
@@ -44,17 +45,25 @@ export function FocusInterludeSection() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="focus-interlude section-dark">
-      <div className="focus-interlude__steps">
+    <section
+      ref={sectionRef}
+      className="focus-interlude section-dark"
+      aria-label="Đến để làm việc"
+    >
+      <ol className="focus-interlude__steps">
         {FOCUS_STEPS.map((step, index) => (
-          <div className="focus-step" key={step}>
-            <span>0{index + 1}.</span>
+          <li className="focus-step" key={step}>
+            <span aria-hidden="true">0{index + 1}.</span>
             <strong>{step}</strong>
-          </div>
+          </li>
         ))}
+      </ol>
+      <div className="focus-interlude__footer">
+        <PublicActionLink className="focus-trigger" href="/workspace">
+          VÀO WORKSPACE
+        </PublicActionLink>
+        <p className="focus-interlude__stamp">KIÊN TRÌ — KỶ LUẬT</p>
       </div>
-      <PublicActionLink className="focus-trigger" href="/workspace">VÀO WORKSPACE</PublicActionLink>
-      <div className="focus-interlude__stamp">KIÊN TRÌ — KỶ LUẬT</div>
     </section>
   )
 }

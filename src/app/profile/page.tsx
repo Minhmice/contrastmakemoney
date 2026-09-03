@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth, useAuthLoading } from '@/app/auth-context'
-import ProfilePage from '@/legacy-pages/ProfilePage'
+import ProfilePage from '@/components/pages/ProfilePage'
 
 export default function Page() {
   const user = useAuth()

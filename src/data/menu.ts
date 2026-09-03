@@ -67,6 +67,10 @@ const icedOptions: MenuOptions = {
   ice: ['Less', 'Normal'],
 }
 
+function encodePublicPath(path: string): string {
+  return encodeURI(path)
+}
+
 function product(
   category: string,
   id: string,
@@ -78,7 +82,19 @@ function product(
   tags: readonly string[] = [],
 ): MenuProduct {
   const images = productImages[id]
-  return { id, category, nameVi, nameEn, description, image: images?.[0], imageHover: images?.[1], characteristics: tags.length ? tags : description.split(/[,.]/).filter(Boolean).slice(0, 3), prices, options, tags }
+  return {
+    id,
+    category,
+    nameVi,
+    nameEn,
+    description,
+    image: images?.[0] ? encodePublicPath(images[0]) : undefined,
+    imageHover: images?.[1] ? encodePublicPath(images[1]) : undefined,
+    characteristics: tags.length ? tags : description.split(/[,.]/).filter(Boolean).slice(0, 3),
+    prices,
+    options,
+    tags,
+  }
 }
 
 export const MENU_CATEGORIES: readonly MenuCategory[] = [

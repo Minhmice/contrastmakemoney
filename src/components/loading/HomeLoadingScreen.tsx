@@ -159,7 +159,6 @@ export function HomeLoadingScreen({ images = HOME_LOADING_IMAGES }: HomeLoadingS
             return
           }
 
-          const viewportWidth = window.innerWidth
           const viewportHeight = window.innerHeight
           const center = (cards.length - 1) / 2
           const getFinalX = (index: number) => (index - center) * 4.5
@@ -193,8 +192,8 @@ export function HomeLoadingScreen({ images = HOME_LOADING_IMAGES }: HomeLoadingS
               transformOrigin: '50% 50%',
             })
             gsap.set(cards, {
-              x: (index) => (index % 2 === 0 ? -1 : 1) * (viewportWidth * 0.58 + 120 + (index % 3) * 28),
-              y: (index) => viewportHeight * 0.58 + 120 + (index % 3) * 28,
+              x: (index) => (index % 2 === 0 ? -1 : 1) * (window.innerWidth * 0.58 + 120 + (index % 3) * 28),
+              y: (index) => viewportHeight + 120 + (index % 3) * 28,
               rotation: (index) => (index % 2 === 0 ? -1 : 1) * (11 + (index % 4) * 2),
               scale: 0.94,
               autoAlpha: 0,

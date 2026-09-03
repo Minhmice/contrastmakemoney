@@ -8,6 +8,7 @@ import { NoiseBg } from '@/components/visual/NoiseBg'
 import { SiteNav } from '@/components/nav/SiteNav'
 import { Card, CardContent } from '@/components/ui/card'
 import { MENU_CATEGORIES, type MenuCategory, type MenuProduct, type MenuSize } from '@/data/menu'
+import { MOTION } from '@/lib/motion'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -30,13 +31,16 @@ function InlineDetail({ product, selectedSize, onClose, onSize, onOrder, pending
 }
 
 function CategoryChapter({ category, selectedProductId, selectedSize, onToggle, onSize, onClose, onOrder, pending }: { category: MenuCategory; selectedProductId: string | null; selectedSize: MenuSize | null; onToggle: (product: MenuProduct) => void; onSize: (size: MenuSize) => void; onClose: () => void; onOrder: () => void; pending: boolean }) {
-  return <section className="menu-chapter" data-category={category.id} data-theme={category.theme}><div className="menu-chapter__rail">{category.sideLabel}</div><div className="menu-chapter__main"><header className="menu-chapter__head"><span aria-hidden="true" /><h2>{category.name}</h2><i aria-hidden="true" /></header><div className="menu-chapter__products">{category.products.map((product) => <div className="menu-product-pair" key={product.id}><ProductCard product={product} selected={selectedProductId === product.id} onToggle={onToggle} />{selectedProductId === product.id && selectedSize ? <InlineDetail product={product} selectedSize={selectedSize} onClose={onClose} onSize={onSize} onOrder={onOrder} pending={pending} /> : null}</div>)}</div></div></section>
+  const selectedProduct = category.products.find((product) => product.id === selectedProductId)
+  return <section className="menu-chapter" data-category={category.id} data-theme={category.theme}><div className="menu-chapter__rail">{category.sideLabel}</div><div className="menu-chapter__main"><header className="menu-chapter__head"><span aria-hidden="true" /><h2>{category.name}</h2><i aria-hidden="true" /></header><div className="menu-chapter__products">{category.products.map((product) => <div className="menu-product-pair" key={product.id}><ProductCard product={product} selected={selectedProductId === product.id} onToggle={onToggle} /></div>)}</div>{selectedProduct && selectedSize ? <InlineDetail product={selectedProduct} selectedSize={selectedSize} onClose={onClose} onSize={onSize} onOrder={onOrder} pending={pending} /> : null}</div></section>
 }
 
 export default function MenuPage({ user }: { user: User | null }) {
   const sceneRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
+  const viewportRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<ScrollTrigger | null>(null)
+  const categoryNavRef = useRef<HTMLElement>(null)
   const [selected, setSelected] = useState<string | null>(null)
   const [selectedSize, setSelectedSize] = useState<MenuSize | null>(null)
   const [activeCategory, setActiveCategory] = useState(MENU_CATEGORIES[0]?.id ?? '')
@@ -51,14 +55,14 @@ export default function MenuPage({ user }: { user: User | null }) {
     const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') closeDetail() }
     window.addEventListener('keydown', closeOnEscape)
     return () => window.removeEventListener('keydown', closeOnEscape)
-  }, [selected])
+  }, [])
   useLayoutEffect(() => {
     const scene = sceneRef.current
     const track = trackRef.current
     if (!scene || !track || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const ctx = gsap.context(() => {
       const getDistance = () => Math.max(0, track.scrollWidth - window.innerWidth)
-      const tween = gsap.to(track, { x: () => -getDistance(), ease: 'none', scrollTrigger: { trigger: scene, start: 'top top', end: () => '+=' + getDistance(), pin: true, scrub: .8, anticipatePin: 1, invalidateOnRefresh: true, onUpdate: () => { const center = -gsap.getProperty(track, 'x') + window.innerWidth / 2; const chapters = [...track.querySelectorAll<HTMLElement>('[data-category]')]; const nearest = chapters.reduce((best, chapter) => Math.abs(chapter.offsetLeft + chapter.offsetWidth / 2 - center) < Math.abs(best.offsetLeft + best.offsetWidth / 2 - center) ? chapter : best, chapters[0]); const id = nearest?.dataset.category; if (id) setActiveCategory((current) => current === id ? current : id) } } })
+      const tween = gsap.to(track, { x: () => -getDistance(), ease: 'none', scrollTrigger: { trigger: scene, start: 'top top', end: () => '+=' + getDistance(), pin: true, scrub: MOTION.reveal.scrub, anticipatePin: 1, invalidateOnRefresh: true, onUpdate: () => { const center = -Number(gsap.getProperty(track, 'x')) + window.innerWidth / 2; const chapters = [...track.querySelectorAll<HTMLElement>('[data-category]')]; const nearest = chapters.reduce((best, chapter) => Math.abs(chapter.offsetLeft + chapter.offsetWidth / 2 - center) < Math.abs(best.offsetLeft + best.offsetWidth / 2 - center) ? chapter : best, chapters[0]); const id = nearest?.dataset.category; if (id) setActiveCategory((current) => current === id ? current : id) } } })
       triggerRef.current = tween.scrollTrigger ?? null
     }, scene)
     const resizeObserver = new ResizeObserver(() => ScrollTrigger.refresh())
@@ -66,9 +70,25 @@ export default function MenuPage({ user }: { user: User | null }) {
     void document.fonts?.ready.then(() => ScrollTrigger.refresh())
     return () => { resizeObserver.disconnect(); triggerRef.current = null; ctx.revert() }
   }, [])
+  useEffect(() => {
+    const viewport = viewportRef.current
+    if (!viewport) return
+    let startX = 0
+    let startY = 0
+    const onStart = (event: TouchEvent) => { const touch = event.touches[0]; startX = touch?.clientX ?? 0; startY = touch?.clientY ?? 0 }
+    const onMove = (event: TouchEvent) => { if (Math.abs((event.touches[0]?.clientX ?? startX) - startX) > Math.abs((event.touches[0]?.clientY ?? startY) - startY)) event.preventDefault() }
+    const onEnd = (event: TouchEvent) => { const deltaX = startX - (event.changedTouches[0]?.clientX ?? startX); const trigger = triggerRef.current; if (!trigger || Math.abs(deltaX) < 24 || Math.abs(deltaX) < Math.abs(startY - (event.changedTouches[0]?.clientY ?? startY))) return; window.scrollTo({ top: Math.min(trigger.end, Math.max(trigger.start, window.scrollY + deltaX)), behavior: 'smooth' }) }
+    viewport.addEventListener('touchstart', onStart, { passive: true })
+    viewport.addEventListener('touchmove', onMove, { passive: false })
+    viewport.addEventListener('touchend', onEnd, { passive: true })
+    return () => { viewport.removeEventListener('touchstart', onStart); viewport.removeEventListener('touchmove', onMove); viewport.removeEventListener('touchend', onEnd) }
+  }, [])
+  useEffect(() => {
+    categoryNavRef.current?.querySelector<HTMLElement>('[data-category-nav="' + activeCategory + '"]')?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+  }, [activeCategory])
 
   const goToCategory = (id: string) => { const trigger = triggerRef.current; const chapter = trackRef.current?.querySelector<HTMLElement>('[data-category="' + id + '"]'); if (!trigger || !chapter) return; const distance = Math.max(1, (trackRef.current?.scrollWidth ?? 0) - window.innerWidth); const progress = Math.min(1, chapter.offsetLeft / distance); window.scrollTo({ top: trigger.start + (trigger.end - trigger.start) * progress, behavior: 'smooth' }) }
   const order = async () => { if (!user) { window.location.assign('/auth'); return } const product = MENU_CATEGORIES.flatMap((category) => category.products).find((item) => item.id === selected); if (!product || !selectedSize || orderPending) return; setOrderPending(true); setOrderMessage(''); try { await createDrinkOrder(user.id, { id: product.id, name: product.nameVi, size: selectedSize, price: product.prices[selectedSize] ?? 0 }); setOrderMessage('ĐÃ LƯU ORDER.'); closeDetail() } catch { setOrderMessage('KHÔNG THỂ LƯU ORDER. THỬ LẠI.') } finally { setOrderPending(false) } }
 
-  return <div className="menu-experience"><NoiseBg /><a className="menu-skip" href="#menu-scene">Nhảy tới thực đơn</a><SiteNav current="menu" /><main className="menu-stage">{orderMessage ? <p className="menu-order-message" role="status">{orderMessage}</p> : null}<nav className="menu-journey-nav" aria-label="Danh mục menu">{MENU_CATEGORIES.map((category) => <button type="button" key={category.id} data-active={activeCategory === category.id || undefined} aria-current={activeCategory === category.id ? 'true' : undefined} onClick={() => goToCategory(category.id)}>{category.name}</button>)}</nav><section ref={sceneRef} id="menu-scene" className="menu-horizontal-scene"><div className="menu-horizontal-viewport"><div ref={trackRef} className="menu-horizontal-track" data-product-open={selected || undefined}>{MENU_CATEGORIES.map((category) => <CategoryChapter key={category.id} category={category} selectedProductId={selected} selectedSize={selectedSize} onToggle={toggle} onSize={setSelectedSize} onClose={closeDetail} onOrder={order} pending={orderPending} />)}</div></div></section></main></div>
+  return <div className="menu-experience"><NoiseBg /><a className="menu-skip" href="#menu-scene">Nhảy tới thực đơn</a><SiteNav current="menu" /><main className="menu-stage">{orderMessage ? <p className="menu-order-message" role="status">{orderMessage}</p> : null}<nav ref={categoryNavRef} className="menu-journey-nav" aria-label="Danh mục menu"><div className="menu-journey-nav__track">{MENU_CATEGORIES.map((category, index) => <button type="button" key={category.id} data-category-nav={category.id} data-active={activeCategory === category.id || undefined} aria-current={activeCategory === category.id ? 'true' : undefined} onClick={() => goToCategory(category.id)}><span className="menu-journey-nav__index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><span>{category.name}</span></button>)}</div></nav><section ref={sceneRef} id="menu-scene" className="menu-horizontal-scene"><div ref={viewportRef} className="menu-horizontal-viewport"><div ref={trackRef} className="menu-horizontal-track" data-product-open={selected || undefined}>{MENU_CATEGORIES.map((category) => <CategoryChapter key={category.id} category={category} selectedProductId={selected} selectedSize={selectedSize} onToggle={toggle} onSize={setSelectedSize} onClose={closeDetail} onOrder={order} pending={orderPending} />)}</div></div></section></main></div>
 }

@@ -40,7 +40,7 @@ export function SiteNav({ current, spy = false }: SiteNavProps) {
   const [readingKey, setReadingKey] = useState<NavKey | undefined>(undefined)
 
   useEffect(() => {
-    if (!spy) return
+    if (!spy || !window.matchMedia('(min-width: 768px)').matches) return
 
     const triggers = NAV_ITEMS.flatMap((item) => {
       const section = item.spyTarget ? document.querySelector(item.spyTarget) : null

@@ -5,6 +5,7 @@ import { PublicActionLink } from '@/components/wrappers/PublicAction'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ContrastLogo } from '@/components/brand/ContrastLogo'
+import { MOTION } from '@/lib/motion'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -13,39 +14,67 @@ export function SiteFooter() {
 
   useEffect(() => {
     const footer = footerRef.current
-    if (!footer || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (
+      !footer ||
+      !window.matchMedia('(min-width: 768px) and (prefers-reduced-motion: no-preference)').matches
+    ) return
+
+    const refresh = () => ScrollTrigger.refresh()
 
     const ctx = gsap.context(() => {
+      const headline = footer.querySelector('.site-footer__headline')
+      const headlineLines = footer.querySelectorAll('.site-footer__headline-line')
+      if (!headline || headlineLines.length === 0) return
+
+      const lineReveal = { yPercent: 72, autoAlpha: 0, filter: 'blur(8px)' }
+      const lineSettled = { yPercent: 0, autoAlpha: 1, filter: 'blur(0px)', ease: 'none' as const }
+      const lineDuration = MOTION.duration.reveal
+      const lineGap = MOTION.duration.sequenceDelay
+
+      gsap.set(headlineLines, lineReveal)
+
       const timeline = gsap.timeline({
         scrollTrigger: {
-          trigger: footer,
-          start: 'top 88%',
-          end: 'top 48%',
-          scrub: 0.45,
+          trigger: headline,
+          start: MOTION.reveal.start,
+          end: MOTION.reveal.end,
+          scrub: MOTION.reveal.scrub,
+          invalidateOnRefresh: true,
         },
+      })
+
+      headlineLines.forEach((line, index) => {
+        timeline.fromTo(
+          line,
+          lineReveal,
+          { ...lineSettled, duration: lineDuration },
+          index * lineGap,
+        )
       })
 
       timeline
         .fromTo(
-          '.site-footer__headline-line',
-          { yPercent: 72, autoAlpha: 0, filter: 'blur(8px)' },
-          { yPercent: 0, autoAlpha: 1, filter: 'blur(0px)', stagger: 0.08, ease: 'none' },
-        )
-        .fromTo(
           '.footer-red-block',
           { xPercent: 36, rotate: 4, autoAlpha: 0 },
-          { xPercent: 0, rotate: 0, autoAlpha: 1, ease: 'none' },
-          0.08,
+          { xPercent: 0, rotate: 0, autoAlpha: 1, ease: 'none', duration: lineDuration },
+          lineGap + 0.1,
         )
         .fromTo(
           '.site-footer__details > *',
           { y: 20, autoAlpha: 0 },
           { y: 0, autoAlpha: 1, stagger: 0.06, ease: 'none' },
-          0.18,
+          lineGap * 2 + 0.12,
         )
     }, footer)
 
-    return () => ctx.revert()
+    void document.fonts?.ready.then(refresh)
+    window.addEventListener('resize', refresh)
+    requestAnimationFrame(refresh)
+
+    return () => {
+      window.removeEventListener('resize', refresh)
+      ctx.revert()
+    }
   }, [])
 
   return (
