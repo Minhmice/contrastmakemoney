@@ -6897,7 +6897,7 @@ html:has(body.auth-is-open) {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.1s ease;
+  transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), transform 120ms var(--ease-out);
 }
 
 .workspace-btn-primary:hover {
@@ -6906,7 +6906,7 @@ html:has(body.auth-is-open) {
 }
 
 .workspace-btn-primary:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
 .workspace-btn-secondary {
@@ -6921,7 +6921,7 @@ html:has(body.auth-is-open) {
   border-radius: 0;
   cursor: pointer;
   padding: 0;
-  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+  transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), transform 120ms var(--ease-out);
 }
 
 .workspace-btn-secondary:hover {
@@ -6930,7 +6930,7 @@ html:has(body.auth-is-open) {
 }
 
 .workspace-btn-secondary:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .workspace-stage__footer-hint {
@@ -7107,6 +7107,45 @@ html:has(body.auth-is-open) {
   width: min(360px, calc(100vw - 32px));
   z-index: 25;
   animation: workspaceToolEnter 0.22s var(--ease-out) forwards;
+  transition: opacity 220ms var(--ease-out);
+}
+
+.workspace-page[data-status='running'] .workspace-tool-card {
+  opacity: 0.52;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .workspace-page[data-status='running'] .workspace-tool-card:hover,
+  .workspace-page[data-status='running'] .workspace-tool-card:focus-within {
+    opacity: 1;
+  }
+}
+
+.workspace-stage__phase-copy {
+  display: inline-block;
+  animation: workspace-phase-enter 200ms var(--ease-out) both;
+}
+
+@keyframes workspace-phase-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.workspace-completion-mark {
+  display: block;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  color: #e01920;
+  text-transform: uppercase;
+  margin-top: 4px;
+  animation: workspace-completion 520ms var(--ease-in-out) both;
+}
+
+@keyframes workspace-completion {
+  0% { opacity: 0; transform: translateY(6px); clip-path: inset(0 100% 0 0); }
+  35%, 72% { opacity: 1; transform: translateY(0); clip-path: inset(0 0 0 0); }
+  100% { opacity: 0; transform: translateY(-4px); clip-path: inset(0 0 0 0); }
 }
 
 .workspace-tool-card--floating {

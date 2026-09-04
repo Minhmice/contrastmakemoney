@@ -135,3 +135,16 @@ test('long Vietnamese menu title wraps without clipping', async () => {
   assert.ok(result.scrollWidth <= result.clientWidth + 1, 'Vietnamese heading clips horizontally')
   await page.close()
 })
+
+test('/workspace exposes focus state without moving controls', async () => {
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
+  await page.goto(`${baseUrl}/workspace`, { waitUntil: 'networkidle' })
+  const root = page.locator('.workspace-page')
+  assert.equal(await root.getAttribute('data-status'), 'idle')
+  await page.getByRole('button', { name: 'Bắt đầu' }).click()
+  assert.equal(await root.getAttribute('data-status'), 'running')
+  await page.getByRole('button', { name: 'Tạm dừng' }).click()
+  assert.equal(await root.getAttribute('data-status'), 'idle')
+  await page.close()
+})
+

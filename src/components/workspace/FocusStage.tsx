@@ -1,7 +1,6 @@
-import { Pause, Play, RotateCcw, SkipForward, TimerReset } from 'lucide-react'
+import { Pause, Play, RotateCcw, SkipForward, SlidersHorizontal, TimerReset } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { formatTime } from '@/features/pomodoro'
-import { eyebrow, workspaceColor, workspaceControl } from './workspace-styles'
 
 type FocusStageProps = {
   phase: 'work' | 'shortBreak' | 'longBreak'
@@ -10,47 +9,227 @@ type FocusStageProps = {
   durationSeconds: number
   workTurn: number
   completedWork: number
+  completionPulse?: number
   progress: number
-  background: string
-  overlay: number
+  background?: string
+  overlay?: number
   activeTask: string | null
+  taskOpen?: boolean
+  onOpenTasks?: () => void
   onStart: () => void
   onPause: () => void
   onReset: () => void
   onSkip: () => void
+  onOpenSettings?: () => void
 }
 
-const phaseLabel = { work: 'TẬP TRUNG', shortBreak: 'NGHỈ NGẮN', longBreak: 'NGHỈ DÀI' }
+const phaseLabel = {
+  work: 'TẬP TRUNG',
+  shortBreak: 'NGHỈ NGẮN',
+  longBreak: 'NGHỈ DÀI',
+}
 
-export function FocusStage({ phase, status, remainingSeconds, durationSeconds, workTurn, completedWork, progress, background, overlay, activeTask, onStart, onPause, onReset, onSkip }: FocusStageProps) {
+const RADIUS = 136
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS
+
+export function FocusStage({
+  phase,
+  status,
+  remainingSeconds,
+  durationSeconds,
+  workTurn,
+  completedWork,
+  completionPulse = 0,
+  progress,
+  activeTask,
+  taskOpen = true,
+  onOpenTasks,
+  onStart,
+  onPause,
+  onReset,
+  onSkip,
+  onOpenSettings,
+}: FocusStageProps) {
   const running = status === 'running'
+  const clampedProgress = Math.min(100, Math.max(0, progress))
+  const strokeDashoffset = CIRCUMFERENCE * (1 - clampedProgress / 100)
 
   return (
-    <section className="workspace-clock" aria-labelledby="focus-stage-title" style={{ position: 'relative', isolation: 'isolate', display: 'grid', alignContent: 'space-between', minHeight: 'clamp(500px, calc(100dvh - 150px), 700px)', overflow: 'hidden', background: workspaceColor.ink, color: workspaceColor.paper, padding: 'clamp(24px, 5vw, 68px)' }}>
-      <div aria-hidden="true" style={{ position: 'absolute', zIndex: -2, inset: 0, backgroundImage: `url(${background})`, backgroundPosition: 'center', backgroundSize: 'cover', filter: 'saturate(.76)' }} />
-      <div aria-hidden="true" style={{ position: 'absolute', zIndex: -1, inset: 0, background: `linear-gradient(112deg, rgba(16,17,15,${Math.min(.95, overlay + .22)}) 18%, rgba(16,17,15,${overlay}) 66%, rgba(16,17,15,${Math.min(.94, overlay + .16)}))` }} />
-      <div aria-hidden="true" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 12, background: workspaceColor.red, transform: `scaleX(${running ? 1 : .5})`, transformOrigin: 'left', transition: 'transform 180ms ease-out' }} />
+    <section
+      className="workspace-clock workspace-stage"
+      aria-labelledby="focus-stage-title"
+    >
+      {/* Top Session Progress Bar */}
+      <div className="workspace-stage__accent-track" aria-hidden="true" />
+      <div
+        className="workspace-stage__accent"
+        role="progressbar"
+        aria-label={`Tiến trình phiên ${phaseLabel[phase]}`}
+        aria-valuenow={Math.round(clampedProgress)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        style={{
+          transform: `scaleX(${clampedProgress / 100})`,
+          transition: clampedProgress === 0 ? 'none' : 'transform 0.25s linear',
+        }}
+      />
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'start' }}>
-        <div style={{ minWidth: 0 }}>
-          <p style={{ ...eyebrow, color: workspaceColor.paper }}>{phaseLabel[phase]} / PHIÊN {workTurn}/4</p>
-          <h1 id="focus-stage-title" style={{ margin: '8px 0 0', maxWidth: 460, fontSize: 'clamp(24px, 3.2vw, 44px)', lineHeight: 1.04, letterSpacing: '-0.04em' }}>{activeTask ?? 'CHỌN MỘT VIỆC.'}</h1>
+      {/* Active Task Banner */}
+      <div className="workspace-stage__task-banner">
+        <div className="workspace-stage__eyebrow-row">
+          <span className="workspace-stage__badge">
+            <span
+              style={{
+                display: 'inline-block',
+                width: 6,
+                height: 6,
+                backgroundColor: '#e01920',
+              }}
+              aria-hidden="true"
+            />
+            <span key={phase} className="workspace-stage__phase-copy">
+              {phaseLabel[phase]}
+            </span> / PHIÊN {workTurn}/4
+          </span>
+          <span className="workspace-stage__status-text" aria-live="polite">
+            {running ? 'ĐANG CHẠY' : 'SẴN SÀNG'} • {completedWork} ĐÃ XONG
+          </span>
         </div>
-        <div aria-live="polite" style={{ flex: '0 0 auto', textAlign: 'right', fontSize: 10, fontWeight: 800, letterSpacing: '0.1em' }}>{running ? 'ĐANG CHẠY' : 'SẴN SÀNG'}<br />{completedWork} ĐÃ XONG</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
+          <h1 id="focus-stage-title" className="workspace-stage__title">
+            {activeTask ?? 'CHỌN MỘT VIỆC.'}
+          </h1>
+          {!taskOpen && onOpenTasks ? (
+            <button
+              type="button"
+              onClick={onOpenTasks}
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                padding: '3px 10px',
+                minHeight: 26,
+                border: '1px solid rgba(243, 241, 234, 0.3)',
+                background: 'rgba(243, 241, 234, 0.1)',
+                color: '#f3f1ea',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+                transition: 'background 0.15s ease',
+              }}
+            >
+              MỞ VIỆC
+            </button>
+          ) : null}
+        </div>
       </div>
 
-      <div style={{ maxWidth: 660, minWidth: 0, paddingTop: 40 }}>
-        <time dateTime={`PT${remainingSeconds}S`} style={{ display: 'block', fontSize: 'clamp(84px, 13vw, 190px)', fontWeight: 900, letterSpacing: '-0.09em', lineHeight: .88, fontVariantNumeric: 'tabular-nums' }}>{formatTime(remainingSeconds)}</time>
-        <div aria-label={`${Math.round(progress)}% thời lượng đã trôi qua`} style={{ height: 6, marginTop: 'clamp(24px, 4vw, 38px)', background: 'rgba(243,241,234,.28)' }}><div style={{ width: `${progress}%`, height: '100%', background: workspaceColor.red, transition: 'width 220ms linear' }} /></div>
-        <p style={{ margin: '12px 0 0', color: 'rgba(243,241,234,.74)', fontSize: 12, fontWeight: 700, letterSpacing: '0.06em' }}>{Math.ceil(durationSeconds / 60)} PHÚT / {phase === 'work' ? 'MỘT VIỆC. MỘT NHỊP.' : 'ĐỨNG DẬY. HÍT THỞ. QUAY LẠI.'}</p>
+      {/* Circular Pomodoro Dial */}
+      <div
+        className="workspace-dial"
+        role="region"
+        aria-label={`Bộ đếm Pomodoro: ${formatTime(remainingSeconds)} còn lại`}
+      >
+        <svg
+          className="workspace-dial__svg"
+          viewBox="0 0 320 320"
+          aria-hidden="true"
+        >
+          {/* Outer dial ticks */}
+          <circle
+            cx="160"
+            cy="160"
+            r="150"
+            className="workspace-dial__tick-ring"
+          />
+          {/* Base track */}
+          <circle
+            cx="160"
+            cy="160"
+            r={RADIUS}
+            className="workspace-dial__track"
+          />
+          {/* Active progress arc */}
+          <circle
+            cx="160"
+            cy="160"
+            r={RADIUS}
+            className="workspace-dial__progress"
+            strokeDasharray={CIRCUMFERENCE}
+            strokeDashoffset={strokeDashoffset}
+          />
+        </svg>
+
+        <div className="workspace-dial__content">
+          <span key={phase} className="workspace-dial__phase workspace-stage__phase-copy">
+            {phaseLabel[phase]}
+          </span>
+          <time
+            dateTime={`PT${remainingSeconds}S`}
+            className="workspace-dial__time"
+          >
+            {formatTime(remainingSeconds)}
+          </time>
+          {completionPulse > 0 ? (
+            <span
+              key={completionPulse}
+              className="workspace-completion-mark"
+              aria-live="polite"
+            >
+              XONG MỘT PHIÊN.
+            </span>
+          ) : null}
+          <span className="workspace-dial__phrase">
+            {phase === 'work'
+              ? 'MỘT VIỆC. MỘT NHỊP.'
+              : 'ĐỨNG DẬY. HÍT THỞ. QUAY LẠI.'}
+          </span>
+        </div>
       </div>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center', paddingTop: 32 }}>
-        <Button type="button" onClick={running ? onPause : onStart} style={{ ...workspaceControl('red'), minWidth: 160, minHeight: 52 }}>{running ? <Pause size={18} /> : <Play size={18} />}{running ? 'TẠM DỪNG' : 'BẮT ĐẦU'}</Button>
-        <Button type="button" onClick={onReset} aria-label="Đặt lại phiên" style={{ ...workspaceControl('paper'), width: 52, minHeight: 52, padding: 0 }}><RotateCcw size={18} /></Button>
-        <Button type="button" onClick={onSkip} aria-label="Chuyển phiên" style={{ ...workspaceControl('paper'), width: 52, minHeight: 52, padding: 0 }}><SkipForward size={18} /></Button>
-        <span style={{ display: 'inline-flex', gap: 7, alignItems: 'center', color: 'rgba(243,241,234,.76)', fontSize: 11, fontWeight: 700 }}><TimerReset size={15} />TỰ LƯU PHIÊN HOÀN THÀNH</span>
+      {/* Controls */}
+      <div className="workspace-controls">
+        <Button
+          type="button"
+          onClick={running ? onPause : onStart}
+          className="workspace-btn-primary"
+        >
+          {running ? <Pause size={18} /> : <Play size={18} />}
+          {running ? 'TẠM DỪNG' : 'BẮT ĐẦU'}
+        </Button>
+        <Button
+          type="button"
+          onClick={onReset}
+          aria-label="Đặt lại phiên"
+          className="workspace-btn-secondary"
+        >
+          <RotateCcw size={18} />
+        </Button>
+        <Button
+          type="button"
+          onClick={onSkip}
+          aria-label="Chuyển phiên"
+          className="workspace-btn-secondary"
+        >
+          <SkipForward size={18} />
+        </Button>
+        {onOpenSettings ? (
+          <Button
+            type="button"
+            onClick={onOpenSettings}
+            aria-label="Cài đặt thời gian phiên"
+            title="Chỉnh thời gian phiên"
+            className="workspace-btn-secondary"
+          >
+            <SlidersHorizontal size={18} />
+          </Button>
+        ) : null}
+      </div>
+
+      <div className="workspace-stage__footer-hint">
+        <TimerReset size={14} />
+        <span>{Math.ceil(durationSeconds / 60)} PHÚT / TỰ LƯU PHIÊN HOÀN THÀNH</span>
       </div>
     </section>
   )
 }
+

@@ -1,16 +1,16 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Image as ImageIcon, ListChecks, Music2, NotebookPen, X } from 'lucide-react'
+import { Image as ImageIcon, ListChecks, Music2, NotebookPen, SlidersHorizontal, X } from 'lucide-react'
 import { useAuth, useAuthLoading } from '@/app/auth-context'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { FocusStage } from '@/components/workspace/FocusStage'
+import { PomodoroSettingsDialog } from '@/components/workspace/PomodoroSettingsDialog'
 import { TaskPanel } from '@/components/workspace/TaskPanel'
 import { WorkspaceHeader } from '@/components/workspace/WorkspaceHeader'
 import { WorkspaceMigrationPrompt } from '@/components/workspace/WorkspaceMigrationPrompt'
 import { type Appearance, type NoteStatus, type WorkspaceTool, WorkspaceTools } from '@/components/workspace/WorkspaceTools'
-import { workspaceColor, workspaceControl } from '@/components/workspace/workspace-styles'
 import { getProgressPercent, usePomodoro } from '@/features/pomodoro'
 import { loadWorkspaceNote, saveWorkspaceNote, type WorkspaceTask } from '@/features/user-data/api'
 import { getWorkspaceMode } from '@/features/workspace/model'
@@ -50,6 +50,7 @@ function useAudio() {
 
   useEffect(() => {
     const audio = new Audio(track.src)
+    audio.preload = 'none'
     audio.volume = volume
     audio.loop = repeat
     audio.addEventListener('error', () => setPlaying(false))
@@ -85,15 +86,164 @@ export default function WorkspacePage() {
   const [draft, setDraft] = useState('')
   const [activeId, setActiveId] = useState<string | null>(null)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
-  const [tool, setTool] = useState<WorkspaceTool>('audio')
+  const [tool, setTool] = useState<WorkspaceTool | null>(null)
+  const [toolPosition, setToolPosition] = useState<{ x: number; y: number } | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const cardRef = useRef<HTMLDivElement | null>(null)
+  const dragStartRef = useRef<{ startX: number; startY: number; posX: number; posY: number } | null>(null)
+
+  const [taskOpen, setTaskOpen] = useState(true)
+  const [taskPosition, setTaskPosition] = useState<{ x: number; y: number } | null>(null)
+  const [isDraggingTask, setIsDraggingTask] = useState(false)
+  const taskCardRef = useRef<HTMLDivElement | null>(null)
+  const taskDragStartRef = useRef<{ startX: number; startY: number; posX: number; posY: number } | null>(null)
+
   const [mobileNoteOpen, setMobileNoteOpen] = useState(false)
   const [mobileToolsOpen, setMobileToolsOpen] = useState(false)
   const [mobileTaskOpen, setMobileTaskOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const [appearance, setAppearance] = useState<Appearance>({ id: 'night', overlay: .58 })
   const [note, setNote] = useState('')
   const [noteStatus, setNoteStatus] = useState<NoteStatus>('idle')
   const savedWork = useRef(0)
+  const previousCompletedWork = useRef(state.completedWork)
+  const [completionPulse, setCompletionPulse] = useState(0)
   const startedAt = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (state.completedWork > previousCompletedWork.current) {
+      setCompletionPulse((value) => value + 1)
+    }
+    previousCompletedWork.current = state.completedWork
+  }, [state.completedWork])
+
+  const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return
+    if ((e.target as HTMLElement).closest('button')) return
+
+    const card = cardRef.current
+    const currentPos = toolPosition ?? (card ? {
+      x: card.getBoundingClientRect().left,
+      y: card.getBoundingClientRect().top,
+    } : {
+      x: Math.max(16, (typeof window !== 'undefined' ? window.innerWidth : 1200) - 388),
+      y: 88,
+    })
+
+    dragStartRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      posX: currentPos.x,
+      posY: currentPos.y,
+    }
+    setIsDragging(true)
+
+    const onPointerMove = (ev: PointerEvent) => {
+      if (!dragStartRef.current) return
+      const deltaX = ev.clientX - dragStartRef.current.startX
+      const deltaY = ev.clientY - dragStartRef.current.startY
+      const cardWidth = cardRef.current?.offsetWidth ?? 360
+      const minX = 16
+      const maxX = Math.max(minX, window.innerWidth - cardWidth - 16)
+      const minY = 64
+      const maxY = Math.max(minY, window.innerHeight - 100)
+
+      setToolPosition({
+        x: Math.min(Math.max(dragStartRef.current.posX + deltaX, minX), maxX),
+        y: Math.min(Math.max(dragStartRef.current.posY + deltaY, minY), maxY),
+      })
+    }
+
+    const onPointerUp = () => {
+      dragStartRef.current = null
+      setIsDragging(false)
+      window.removeEventListener('pointermove', onPointerMove)
+      window.removeEventListener('pointerup', onPointerUp)
+      window.removeEventListener('pointercancel', onPointerUp)
+    }
+
+    window.addEventListener('pointermove', onPointerMove)
+    window.addEventListener('pointerup', onPointerUp)
+    window.addEventListener('pointercancel', onPointerUp)
+  }, [toolPosition])
+
+  const handleTaskPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return
+    if ((e.target as HTMLElement).closest('button, input, textarea, form, a, label')) return
+
+    const card = taskCardRef.current
+    const currentPos = taskPosition ?? (card ? {
+      x: card.getBoundingClientRect().left,
+      y: card.getBoundingClientRect().top,
+    } : {
+      x: 28,
+      y: 88,
+    })
+
+    taskDragStartRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      posX: currentPos.x,
+      posY: currentPos.y,
+    }
+    setIsDraggingTask(true)
+
+    const onPointerMove = (ev: PointerEvent) => {
+      if (!taskDragStartRef.current) return
+      const deltaX = ev.clientX - taskDragStartRef.current.startX
+      const deltaY = ev.clientY - taskDragStartRef.current.startY
+      const cardWidth = taskCardRef.current?.offsetWidth ?? 360
+      const minX = 16
+      const maxX = Math.max(minX, window.innerWidth - cardWidth - 16)
+      const minY = 64
+      const maxY = Math.max(minY, window.innerHeight - 100)
+
+      setTaskPosition({
+        x: Math.min(Math.max(taskDragStartRef.current.posX + deltaX, minX), maxX),
+        y: Math.min(Math.max(taskDragStartRef.current.posY + deltaY, minY), maxY),
+      })
+    }
+
+    const onPointerUp = () => {
+      taskDragStartRef.current = null
+      setIsDraggingTask(false)
+      window.removeEventListener('pointermove', onPointerMove)
+      window.removeEventListener('pointerup', onPointerUp)
+      window.removeEventListener('pointercancel', onPointerUp)
+    }
+
+    window.addEventListener('pointermove', onPointerMove)
+    window.addEventListener('pointerup', onPointerUp)
+    window.addEventListener('pointercancel', onPointerUp)
+  }, [taskPosition])
+
+  useEffect(() => {
+    const handleResize = () => {
+      const cardWidth = 360
+      const minX = 16
+      const maxX = Math.max(minX, window.innerWidth - cardWidth - 16)
+      const minY = 64
+      const maxY = Math.max(minY, window.innerHeight - 100)
+
+      setToolPosition((prev) => {
+        if (!prev) return null
+        return {
+          x: Math.min(Math.max(prev.x, minX), maxX),
+          y: Math.min(Math.max(prev.y, minY), maxY),
+        }
+      })
+
+      setTaskPosition((prev) => {
+        if (!prev) return null
+        return {
+          x: Math.min(Math.max(prev.x, minX), maxX),
+          y: Math.min(Math.max(prev.y, minY), maxY),
+        }
+      })
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const refresh = useCallback(async () => {
     if (!repository) return
@@ -153,24 +303,412 @@ export default function WorkspacePage() {
   const activeTask = tasks.find((task) => task.id === activeId && !task.done)?.title ?? null
   const progress = getProgressPercent(state.remainingSeconds, state.durationSeconds)
 
-  if (authLoading) return <main style={{ minHeight: '100dvh', background: workspaceColor.ink }} aria-busy="true" />
+  if (authLoading) return <main className="workspace-page" aria-busy="true" />
 
-  const taskPanel = <TaskPanel tasks={tasks} draft={draft} loading={loading} activeId={activeId} compact={!desktop} onDraftChange={setDraft} onAdd={() => void addTask()} onSelect={selectTask} onToggle={(task) => void toggleTask(task)} />
-  const tools = <WorkspaceTools selected={tool} onSelect={setTool} audio={audio} tracks={tracks} appearance={appearance} setAppearance={setAppearance} backgrounds={backgrounds} note={note} noteStatus={noteStatus} noteEnabled={Boolean(user)} onNoteChange={setNoteValue} />
+  return <main className="workspace-page" data-status={state.status} data-phase={state.phase} data-running={state.status === 'running'}>
+    {/* Full-bleed atmospheric background covering entire workspace page */}
+    <div className="workspace-backdrop" aria-hidden="true" style={{ backgroundImage: `url(${background.src})` }} />
+    <div className="workspace-backdrop__overlay" aria-hidden="true" style={{ opacity: appearance.overlay }} />
+    <div className="workspace-backdrop__grain" aria-hidden="true" />
 
-  return <main style={{ minHeight: '100dvh', background: workspaceColor.ink, color: workspaceColor.paper }}>
     <WorkspaceHeader mode={mode} status={saveStatus} completedWork={state.completedWork} />
     {repository?.mode === 'account' ? <WorkspaceMigrationPrompt account={repository} onImported={() => void refresh()} /> : null}
-    <div style={{ width: 'min(1440px, 100%)', margin: '0 auto', padding: desktop ? 24 : 0, display: 'grid', gridTemplateColumns: desktop ? 'minmax(280px, .78fr) minmax(0, 1.58fr) minmax(280px, .78fr)' : '1fr', gap: desktop ? 16 : 0, alignItems: 'start' }}>
-      <aside style={{ minWidth: 0, order: desktop ? 0 : 1, background: workspaceColor.paper, color: workspaceColor.ink, padding: 'clamp(20px, 3vw, 32px)' }}>{desktop ? taskPanel : <Button type="button" onClick={() => setMobileTaskOpen(true)} style={{ display: 'grid', gridTemplateColumns: 'auto minmax(0, 1fr) auto', width: '100%', gap: 12, alignItems: 'center', background: 'transparent', color: workspaceColor.ink, textAlign: 'left', padding: 0 }}><ListChecks color={workspaceColor.red} /><span style={{ minWidth: 0 }}><strong style={{ display: 'block' }}>{activeTask ?? 'CHỌN VIỆC CẦN LÀM'}</strong><span style={{ display: 'block', marginTop: 3, color: workspaceColor.muted, fontSize: 11 }}>MỞ TASK LEDGER</span></span><span aria-hidden="true">{tasks.filter((task) => !task.done).length}</span></Button>}</aside>
-      <FocusStage phase={state.phase} status={state.status} remainingSeconds={state.remainingSeconds} durationSeconds={state.durationSeconds} workTurn={state.workTurn} completedWork={state.completedWork} progress={progress} background={background.src} overlay={appearance.overlay} activeTask={activeTask} onStart={start} onPause={pause} onReset={reset} onSkip={skip} />
-      <aside style={{ minWidth: 0, order: desktop ? 2 : 2, background: workspaceColor.paper, color: workspaceColor.ink, padding: 'clamp(20px, 3vw, 32px)' }}>{desktop ? tools : <div style={{ display: 'grid', gap: 8 }}><p style={{ margin: 0, color: workspaceColor.muted, fontSize: 12 }}>Âm thanh, không gian, ghi chú</p><Button type="button" onClick={() => setMobileToolsOpen(true)} style={{ ...workspaceControl('ink'), width: '100%' }}><Music2 size={16} />MỞ CÔNG CỤ</Button></div>}</aside>
+
+    <div className="workspace-container">
+      <FocusStage
+        phase={state.phase}
+        status={state.status}
+        remainingSeconds={state.remainingSeconds}
+        durationSeconds={state.durationSeconds}
+        workTurn={state.workTurn}
+        completedWork={state.completedWork}
+        completionPulse={completionPulse}
+        progress={progress}
+        background={background.src}
+        overlay={appearance.overlay}
+        activeTask={activeTask}
+        taskOpen={desktop ? taskOpen : false}
+        onOpenTasks={() => {
+          if (desktop) setTaskOpen(true)
+          else setMobileTaskOpen(true)
+        }}
+        onStart={start}
+        onPause={pause}
+        onReset={reset}
+        onSkip={skip}
+        onOpenSettings={() => setSettingsOpen(true)}
+      />
+
+      {!desktop ? (
+        <div style={{ display: 'grid', gap: 10, width: '100%', maxWidth: 520, margin: '14px auto 0' }}>
+          <Button
+            type="button"
+            onClick={() => setMobileTaskOpen(true)}
+            className="workspace-ctrl-paper"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'auto minmax(0, 1fr) auto',
+              width: '100%',
+              gap: 12,
+              alignItems: 'center',
+              textAlign: 'left',
+              minHeight: 52,
+            }}
+          >
+            <ListChecks color="#e01920" size={20} />
+            <span style={{ minWidth: 0 }}>
+              <strong style={{ display: 'block', fontSize: 13, lineHeight: 1.2 }}>{activeTask ?? 'CHỌN VIỆC CẦN LÀM'}</strong>
+              <span style={{ display: 'block', marginTop: 2, color: '#6a6962', fontSize: 10, fontWeight: 800 }}>MỞ TASK LEDGER</span>
+            </span>
+            <span style={{ fontSize: 11, fontWeight: 900, background: '#e01920', color: '#f3f1ea', padding: '2px 8px' }}>
+              {tasks.filter((t) => !t.done).length}
+            </span>
+          </Button>
+
+          <Button
+            type="button"
+            onClick={() => setMobileToolsOpen(true)}
+            className="workspace-ctrl-paper"
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              minHeight: 48,
+            }}
+          >
+            <Music2 size={16} color="#e01920" />
+            <span>MỞ TIỆN ÍCH</span>
+          </Button>
+        </div>
+      ) : null}
     </div>
 
-    {!desktop ? <Button className="workspace-tool-trigger" type="button" aria-expanded={mobileToolsOpen} aria-controls="workspace-tool-menu" onClick={() => setMobileToolsOpen((open) => !open)} style={{ ...workspaceControl('ink'), position: 'fixed', zIndex: 20, right: 12, bottom: 12, minHeight: 48 }}><NotebookPen size={16} />Công cụ</Button> : null}
-    {!desktop && mobileToolsOpen ? <nav id="workspace-tool-menu" aria-label="Công cụ workspace" style={{ position: 'fixed', zIndex: 21, right: 12, bottom: 68, display: 'grid', width: 'min(320px, calc(100vw - 24px))', gap: 1, background: workspaceColor.paper, border: `1px solid ${workspaceColor.ink}`, padding: 6 }}><Button type="button" onClick={() => { setTool('audio'); setMobileToolsOpen(false) }} style={{ ...workspaceControl('paper'), justifyContent: 'start' }}><Music2 size={16} />Âm thanh</Button><Button type="button" onClick={() => { setTool('appearance'); setMobileToolsOpen(false) }} style={{ ...workspaceControl('paper'), justifyContent: 'start' }}><ImageIcon size={16} />Không gian</Button><Button type="button" onClick={() => { setTool('notes'); setMobileNoteOpen(true); setMobileToolsOpen(false) }} style={{ ...workspaceControl('paper'), justifyContent: 'start' }}><NotebookPen size={16} />Ghi chú</Button></nav> : null}
+    {/* Desktop Floating & Draggable Task Card */}
+    {desktop && taskOpen ? (
+      <div
+        ref={taskCardRef}
+        className={`workspace-tool-card workspace-task-card--floating ${isDraggingTask ? 'workspace-tool-card--dragging' : ''}`}
+        style={
+          taskPosition
+            ? { left: `${taskPosition.x}px`, top: `${taskPosition.y}px`, right: 'auto' }
+            : { left: '28px', top: '88px', right: 'auto' }
+        }
+      >
+        <TaskPanel
+          tasks={tasks}
+          draft={draft}
+          loading={loading}
+          activeId={activeId}
+          compact={false}
+          onClose={() => setTaskOpen(false)}
+          dragHandleProps={{
+            onPointerDown: handleTaskPointerDown,
+            style: { cursor: isDraggingTask ? 'grabbing' : 'grab' },
+          }}
+          onDraftChange={setDraft}
+          onAdd={() => void addTask()}
+          onSelect={selectTask}
+          onToggle={(task) => void toggleTask(task)}
+        />
+      </div>
+    ) : null}
 
-    <Dialog open={mobileTaskOpen} onOpenChange={setMobileTaskOpen}><DialogContent style={{ width: 'min(100vw, 560px)', maxHeight: '88dvh', overflowY: 'auto', borderRadius: 0, background: workspaceColor.paper, color: workspaceColor.ink, padding: 24 }}><DialogHeader><DialogTitle style={{ fontSize: 28, lineHeight: 1.04, letterSpacing: '-0.04em' }}>TASK LEDGER</DialogTitle><DialogDescription>Chọn một việc trước khi bắt đầu phiên.</DialogDescription></DialogHeader>{taskPanel}</DialogContent></Dialog>
-    <Dialog open={!desktop && mobileNoteOpen} onOpenChange={(open) => setMobileNoteOpen(open)}><DialogContent style={{ position: 'fixed', top: 'auto', right: 0, bottom: 0, left: 0, transform: 'none', width: '100vw', maxWidth: '100vw', maxHeight: '78dvh', overflowY: 'auto', borderRadius: 0, background: workspaceColor.paper, color: workspaceColor.ink, padding: 24 }}><DialogHeader><DialogTitle style={{ fontSize: 28, lineHeight: 1.04, letterSpacing: '-0.04em' }}>GHI CHÚ</DialogTitle><DialogDescription>Giữ ý tưởng gần phiên tập trung.</DialogDescription></DialogHeader>{tools}<DialogFooter style={{ margin: '8px 0 0', padding: 0, border: 0, background: 'transparent' }}><Button type="button" onClick={() => { setTool('audio'); setMobileNoteOpen(false) }} style={workspaceControl('ink')}><X size={16} />ĐÓNG</Button></DialogFooter></DialogContent></Dialog>
+    {/* Desktop Floating & Draggable Tool Card */}
+    {desktop && tool !== null ? (
+      <div
+        ref={cardRef}
+        className={`workspace-tool-card workspace-tool-card--floating ${isDragging ? 'workspace-tool-card--dragging' : ''}`}
+        style={
+          toolPosition
+            ? { left: `${toolPosition.x}px`, top: `${toolPosition.y}px`, right: 'auto' }
+            : { right: '28px', top: '88px', left: 'auto' }
+        }
+      >
+        <WorkspaceTools
+          selected={tool}
+          onSelect={setTool}
+          onClose={() => setTool(null)}
+          dragHandleProps={{
+            onPointerDown: handlePointerDown,
+            style: { cursor: isDragging ? 'grabbing' : 'grab' },
+          }}
+          audio={audio}
+          tracks={tracks}
+          appearance={appearance}
+          setAppearance={setAppearance}
+          backgrounds={backgrounds}
+          note={note}
+          noteStatus={noteStatus}
+          noteEnabled={Boolean(user)}
+          onNoteChange={setNoteValue}
+        />
+      </div>
+    ) : null}
+
+    {/* Floating tool trigger button (accessible and responsive across all viewports) */}
+    <Button
+      className="workspace-tool-trigger"
+      type="button"
+      aria-expanded={mobileToolsOpen}
+      aria-controls="workspace-tool-menu"
+      onClick={() => setMobileToolsOpen((open) => !open)}
+      aria-label="Công cụ"
+    >
+      <NotebookPen size={16} />
+      <span>Công cụ</span>
+    </Button>
+
+    {mobileToolsOpen ? (
+      <nav
+        id="workspace-tool-menu"
+        aria-label="Công cụ workspace"
+        className="workspace-tool-menu-popover"
+      >
+        <div
+          style={{
+            padding: '6px 10px 4px',
+            borderBottom: '1px solid rgba(16, 17, 15, 0.12)',
+            marginBottom: 4,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <span style={{ fontSize: 10, fontWeight: 900, letterSpacing: '0.12em', color: '#6a6962' }}>
+            BỘ TIỆN ÍCH
+          </span>
+          {(tool || (desktop && taskOpen)) ? (
+            <span style={{ fontSize: 9, fontWeight: 800, background: '#e01920', color: '#f3f1ea', padding: '1px 6px' }}>
+              ĐANG MỞ
+            </span>
+          ) : null}
+        </div>
+
+        <Button
+          type="button"
+          onClick={() => {
+            if (desktop) {
+              setTaskOpen((open) => !open)
+            } else {
+              setMobileTaskOpen(true)
+            }
+            setMobileToolsOpen(false)
+          }}
+          className="workspace-ctrl-paper"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            justifyContent: 'flex-start',
+            border: 0,
+            background: (desktop && taskOpen) ? 'rgba(224, 25, 32, 0.08)' : undefined,
+            fontWeight: (desktop && taskOpen) ? 900 : 800,
+          }}
+        >
+          <ListChecks size={16} color="#e01920" />
+          <span style={{ flex: 1, textAlign: 'left' }}>Việc cần làm</span>
+          {(desktop && taskOpen) ? <span style={{ fontSize: 10, color: '#e01920', fontWeight: 900 }}>• Đang mở</span> : null}
+        </Button>
+
+        <Button
+          type="button"
+          onClick={() => {
+            setTool('audio')
+            setMobileToolsOpen(false)
+            if (!desktop) setMobileNoteOpen(true)
+          }}
+          className="workspace-ctrl-paper"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            justifyContent: 'flex-start',
+            border: 0,
+            background: tool === 'audio' ? 'rgba(224, 25, 32, 0.08)' : undefined,
+            fontWeight: tool === 'audio' ? 900 : 800,
+          }}
+        >
+          <Music2 size={16} color="#e01920" />
+          <span style={{ flex: 1, textAlign: 'left' }}>Âm thanh</span>
+          {tool === 'audio' ? <span style={{ fontSize: 10, color: '#e01920', fontWeight: 900 }}>• Đang mở</span> : null}
+        </Button>
+
+        <Button
+          type="button"
+          onClick={() => {
+            setTool('appearance')
+            setMobileToolsOpen(false)
+            if (!desktop) setMobileNoteOpen(true)
+          }}
+          className="workspace-ctrl-paper"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            justifyContent: 'flex-start',
+            border: 0,
+            background: tool === 'appearance' ? 'rgba(224, 25, 32, 0.08)' : undefined,
+            fontWeight: tool === 'appearance' ? 900 : 800,
+          }}
+        >
+          <ImageIcon size={16} color="#e01920" />
+          <span style={{ flex: 1, textAlign: 'left' }}>Không gian</span>
+          {tool === 'appearance' ? <span style={{ fontSize: 10, color: '#e01920', fontWeight: 900 }}>• Đang mở</span> : null}
+        </Button>
+
+        <Button
+          type="button"
+          onClick={() => {
+            setTool('notes')
+            setMobileToolsOpen(false)
+            if (!desktop) setMobileNoteOpen(true)
+          }}
+          className="workspace-ctrl-paper"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            justifyContent: 'flex-start',
+            border: 0,
+            background: tool === 'notes' ? 'rgba(224, 25, 32, 0.08)' : undefined,
+            fontWeight: tool === 'notes' ? 900 : 800,
+          }}
+        >
+          <NotebookPen size={16} color="#e01920" />
+          <span style={{ flex: 1, textAlign: 'left' }}>Ghi chú</span>
+          {tool === 'notes' ? <span style={{ fontSize: 10, color: '#e01920', fontWeight: 900 }}>• Đang mở</span> : null}
+        </Button>
+
+        <Button
+          type="button"
+          onClick={() => {
+            setSettingsOpen(true)
+            setMobileToolsOpen(false)
+          }}
+          className="workspace-ctrl-paper"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            justifyContent: 'flex-start',
+            border: 0,
+            fontWeight: 800,
+          }}
+        >
+          <SlidersHorizontal size={16} color="#e01920" />
+          <span style={{ flex: 1, textAlign: 'left' }}>Thời gian phiên</span>
+        </Button>
+
+        {(tool !== null || (desktop && taskOpen)) ? (
+          <Button
+            type="button"
+            onClick={() => {
+              setTool(null)
+              if (desktop) setTaskOpen(false)
+              setMobileNoteOpen(false)
+              setMobileToolsOpen(false)
+            }}
+            className="workspace-ctrl-paper"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              justifyContent: 'flex-start',
+              borderTop: '1px solid rgba(16, 17, 15, 0.12)',
+              marginTop: 4,
+              color: '#e01920',
+            }}
+          >
+            <X size={16} />
+            <span>Tắt toàn bộ cửa sổ</span>
+          </Button>
+        ) : null}
+      </nav>
+    ) : null}
+
+    {/* Task Dialog for Mobile */}
+    <Dialog open={mobileTaskOpen} onOpenChange={setMobileTaskOpen}>
+      <DialogContent className="workspace-sheet-content">
+        <DialogHeader>
+          <DialogTitle style={{ fontSize: 24, lineHeight: 1.05, letterSpacing: '-0.04em', fontWeight: 900 }}>
+            TASK LEDGER
+          </DialogTitle>
+          <DialogDescription style={{ color: '#6a6962', fontSize: 12 }}>
+            Chọn một việc trước khi bắt đầu phiên tập trung.
+          </DialogDescription>
+        </DialogHeader>
+        <TaskPanel
+          tasks={tasks}
+          draft={draft}
+          loading={loading}
+          activeId={activeId}
+          compact
+          onClose={() => setMobileTaskOpen(false)}
+          onDraftChange={setDraft}
+          onAdd={() => void addTask()}
+          onSelect={selectTask}
+          onToggle={(task) => void toggleTask(task)}
+        />
+        <DialogFooter style={{ margin: '14px 0 0', padding: 0, border: 0, background: 'transparent' }}>
+          <Button
+            type="button"
+            onClick={() => setMobileTaskOpen(false)}
+            className="workspace-ctrl-paper"
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+          >
+            <X size={16} /> ĐÓNG
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    {/* Tool/Notes Dialog for Mobile */}
+    <Dialog open={mobileNoteOpen} onOpenChange={setMobileNoteOpen}>
+      <DialogContent className="workspace-sheet-content workspace-notes-dialog-content">
+        <DialogHeader>
+          <DialogTitle style={{ fontSize: 24, lineHeight: 1.05, letterSpacing: '-0.04em', fontWeight: 900 }}>
+            BỘ CÔNG CỤ
+          </DialogTitle>
+          <DialogDescription style={{ color: '#6a6962', fontSize: 12 }}>
+            Giữ ý tưởng, âm nhạc và không gian gần phiên tập trung.
+          </DialogDescription>
+        </DialogHeader>
+        <WorkspaceTools
+          selected={tool ?? 'notes'}
+          onSelect={setTool}
+          onClose={() => setMobileNoteOpen(false)}
+          audio={audio}
+          tracks={tracks}
+          appearance={appearance}
+          setAppearance={setAppearance}
+          backgrounds={backgrounds}
+          note={note}
+          noteStatus={noteStatus}
+          noteEnabled={Boolean(user)}
+          onNoteChange={setNoteValue}
+        />
+        <DialogFooter style={{ margin: '14px 0 0', padding: 0, border: 0, background: 'transparent' }}>
+          <Button
+            type="button"
+            onClick={() => setMobileNoteOpen(false)}
+            className="workspace-ctrl-paper"
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+          >
+            <X size={16} /> ĐÓNG
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    {/* Pomodoro Session Durations Settings Dialog */}
+    <PomodoroSettingsDialog
+      open={settingsOpen}
+      onOpenChange={setSettingsOpen}
+      settings={state.settings}
+      onSave={setSettings}
+    />
   </main>
 }
+
