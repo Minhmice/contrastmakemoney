@@ -307,7 +307,12 @@ export default function WorkspacePage() {
 
   return <main className="workspace-page" data-status={state.status} data-phase={state.phase} data-running={state.status === 'running'}>
     {/* Full-bleed atmospheric background covering entire workspace page */}
-    <div className="workspace-backdrop" aria-hidden="true" style={{ backgroundImage: `url(${background.src})` }} />
+    <div
+      key={background.src}
+      className="workspace-backdrop"
+      aria-hidden="true"
+      style={{ backgroundImage: `url(${background.src})` }}
+    />
     <div className="workspace-backdrop__overlay" aria-hidden="true" style={{ opacity: appearance.overlay }} />
     <div className="workspace-backdrop__grain" aria-hidden="true" />
 
@@ -386,10 +391,11 @@ export default function WorkspacePage() {
     </div>
 
     {/* Desktop Floating & Draggable Task Card */}
-    {desktop && taskOpen ? (
+    {desktop ? (
       <div
         ref={taskCardRef}
         className={`workspace-tool-card workspace-task-card--floating ${isDraggingTask ? 'workspace-tool-card--dragging' : ''}`}
+        data-open={taskOpen}
         style={
           taskPosition
             ? { left: `${taskPosition.x}px`, top: `${taskPosition.y}px`, right: 'auto' }
@@ -416,10 +422,11 @@ export default function WorkspacePage() {
     ) : null}
 
     {/* Desktop Floating & Draggable Tool Card */}
-    {desktop && tool !== null ? (
+    {desktop ? (
       <div
         ref={cardRef}
         className={`workspace-tool-card workspace-tool-card--floating ${isDragging ? 'workspace-tool-card--dragging' : ''}`}
+        data-open={tool !== null}
         style={
           toolPosition
             ? { left: `${toolPosition.x}px`, top: `${toolPosition.y}px`, right: 'auto' }
@@ -427,7 +434,7 @@ export default function WorkspacePage() {
         }
       >
         <WorkspaceTools
-          selected={tool}
+          selected={tool ?? 'audio'}
           onSelect={setTool}
           onClose={() => setTool(null)}
           dragHandleProps={{

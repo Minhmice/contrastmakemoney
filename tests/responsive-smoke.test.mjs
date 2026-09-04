@@ -114,6 +114,12 @@ test('/workspace mobile tools open a full-width bottom sheet', async () => {
   await page.goto(`${baseUrl}/workspace`, { waitUntil: 'networkidle' })
   await page.getByRole('button', { name: 'Công cụ' }).click()
   await page.locator('#workspace-tool-menu').getByRole('button', { name: 'Ghi chú' }).click()
+  await page.waitForFunction(() => {
+    const el = document.querySelector('#workspace-notes-panel')
+    if (!el) return false
+    const rect = el.getBoundingClientRect()
+    return Math.abs(rect.bottom - 667) <= 1
+  })
   const sheet = await page.locator('#workspace-notes-panel').evaluate((element) => {
     const rect = element.getBoundingClientRect()
     return { left: rect.left, right: rect.right, bottom: rect.bottom, width: rect.width }
@@ -147,4 +153,24 @@ test('/workspace exposes focus state without moving controls', async () => {
   assert.equal(await root.getAttribute('data-status'), 'idle')
   await page.close()
 })
+
+test('/workspace panel motion respects reduced motion', async () => {
+  const page = await browser.newPage({ viewport: { width: 375, height: 667 } })
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto(`${baseUrl}/workspace`, { waitUntil: 'networkidle' })
+  await page.getByRole('button', { name: 'Công cụ' }).click()
+  const menu = page.locator('#workspace-tool-menu')
+  const style = await menu.evaluate((element) => {
+    const computed = getComputedStyle(element)
+    return { animationDuration: computed.animationDuration, transform: computed.transform }
+  })
+  assert.ok(
+    style.animationDuration === '0.01ms' ||
+      style.animationDuration === '0s' ||
+      style.animationDuration === '1e-05s'
+  )
+  assert.ok(style.transform === 'none' || style.transform.includes('matrix(1'))
+  await page.close()
+})
+
 
