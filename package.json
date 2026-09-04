@@ -17,7 +17,8 @@
     "smoke:loading": "node --experimental-strip-types src/components/loading/self-check.ts",
     "smoke:responsive": "node --test tests/responsive-smoke.test.mjs",
     "check:user-data": "node scripts/self-check-user-data.mjs",
-    "check:workspace": "node --experimental-strip-types src/features/workspace/guest-storage.self-check.ts && node --experimental-strip-types src/features/workspace/migration.self-check.ts && node --experimental-strip-types src/features/workspace/lifecycle.self-check.ts"
+    "check:workspace": "node --experimental-strip-types src/features/workspace/guest-storage.self-check.ts && node --experimental-strip-types src/features/workspace/migration.self-check.ts && node --experimental-strip-types src/features/workspace/lifecycle.self-check.ts",
+    "check:workspace-motion": "node --test tests/workspace-motion-contract.test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
