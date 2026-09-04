@@ -173,4 +173,22 @@ test('/workspace panel motion respects reduced motion', async () => {
   await page.close()
 })
 
+test('/workspace floating card drag stays inside viewport', async () => {
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
+  await page.goto(`${baseUrl}/workspace`, { waitUntil: 'networkidle' })
+  const card = page.locator('.workspace-task-card--floating')
+  const header = card.locator('.workspace-tool-card__header')
+  const box = await header.boundingBox()
+  assert.ok(box, 'task card header must exist')
+  await page.mouse.move(box.x + 20, box.y + 20)
+  await page.mouse.down()
+  await page.mouse.move(1380, 840, { steps: 8 })
+  await page.mouse.up()
+  const rect = await card.evaluate((element) => element.getBoundingClientRect())
+  assert.ok(rect.left >= 0 && rect.right <= 1440, `expected left >= 0 and right <= 1440, got left=${rect.left}, right=${rect.right}`)
+  assert.ok(rect.top >= 0 && rect.bottom <= 900, `expected top >= 0 and bottom <= 900, got top=${rect.top}, bottom=${rect.bottom}`)
+  await page.close()
+})
+
+
 

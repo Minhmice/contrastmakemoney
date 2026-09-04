@@ -90,13 +90,11 @@ export default function WorkspacePage() {
   const [toolPosition, setToolPosition] = useState<{ x: number; y: number } | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const cardRef = useRef<HTMLDivElement | null>(null)
-  const dragStartRef = useRef<{ startX: number; startY: number; posX: number; posY: number } | null>(null)
 
   const [taskOpen, setTaskOpen] = useState(true)
   const [taskPosition, setTaskPosition] = useState<{ x: number; y: number } | null>(null)
   const [isDraggingTask, setIsDraggingTask] = useState(false)
   const taskCardRef = useRef<HTMLDivElement | null>(null)
-  const taskDragStartRef = useRef<{ startX: number; startY: number; posX: number; posY: number } | null>(null)
 
   const [mobileNoteOpen, setMobileNoteOpen] = useState(false)
   const [mobileToolsOpen, setMobileToolsOpen] = useState(false)
@@ -119,114 +117,153 @@ export default function WorkspacePage() {
 
   const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return
-    if ((e.target as HTMLElement).closest('button')) return
+    if ((e.target as HTMLElement).closest('button, input, textarea, form, a, label, [role="checkbox"]')) return
 
     const card = cardRef.current
-    const currentPos = toolPosition ?? (card ? {
-      x: card.getBoundingClientRect().left,
-      y: card.getBoundingClientRect().top,
-    } : {
-      x: Math.max(16, (typeof window !== 'undefined' ? window.innerWidth : 1200) - 388),
-      y: 88,
-    })
+    if (!card) return
 
-    dragStartRef.current = {
-      startX: e.clientX,
-      startY: e.clientY,
-      posX: currentPos.x,
-      posY: currentPos.y,
+    const handle = e.currentTarget
+    const pointerId = e.pointerId
+
+    try {
+      handle.setPointerCapture(pointerId)
+    } catch {
+      // Safe fallback if pointer capture fails
     }
+
+    const initialRect = card.getBoundingClientRect()
+    const startX = e.clientX
+    const startY = e.clientY
+    const initLeft = initialRect.left
+    const initTop = initialRect.top
+    const cardWidth = initialRect.width
+    const cardHeight = initialRect.height
+
+    const minX = 0
+    const maxX = Math.max(0, window.innerWidth - cardWidth)
+    const minY = 0
+    const maxY = Math.max(0, window.innerHeight - cardHeight)
+
+    let finalLeft = initLeft
+    let finalTop = initTop
+
     setIsDragging(true)
 
     const onPointerMove = (ev: PointerEvent) => {
-      if (!dragStartRef.current) return
-      const deltaX = ev.clientX - dragStartRef.current.startX
-      const deltaY = ev.clientY - dragStartRef.current.startY
-      const cardWidth = cardRef.current?.offsetWidth ?? 360
-      const minX = 16
-      const maxX = Math.max(minX, window.innerWidth - cardWidth - 16)
-      const minY = 64
-      const maxY = Math.max(minY, window.innerHeight - 100)
+      const rawDeltaX = ev.clientX - startX
+      const rawDeltaY = ev.clientY - startY
+      const clampedX = Math.min(Math.max(initLeft + rawDeltaX, minX), maxX)
+      const clampedY = Math.min(Math.max(initTop + rawDeltaY, minY), maxY)
+      finalLeft = clampedX
+      finalTop = clampedY
 
-      setToolPosition({
-        x: Math.min(Math.max(dragStartRef.current.posX + deltaX, minX), maxX),
-        y: Math.min(Math.max(dragStartRef.current.posY + deltaY, minY), maxY),
-      })
+      const renderDeltaX = clampedX - initLeft
+      const renderDeltaY = clampedY - initTop
+      card.style.transform = `translate3d(${renderDeltaX}px, ${renderDeltaY}px, 0)`
     }
 
     const onPointerUp = () => {
-      dragStartRef.current = null
-      setIsDragging(false)
+      try {
+        handle.releasePointerCapture(pointerId)
+      } catch {
+        // Safe release
+      }
       window.removeEventListener('pointermove', onPointerMove)
       window.removeEventListener('pointerup', onPointerUp)
       window.removeEventListener('pointercancel', onPointerUp)
+
+      card.style.left = `${finalLeft}px`
+      card.style.top = `${finalTop}px`
+      card.style.transform = ''
+      setToolPosition({ x: finalLeft, y: finalTop })
+      setIsDragging(false)
     }
 
     window.addEventListener('pointermove', onPointerMove)
     window.addEventListener('pointerup', onPointerUp)
     window.addEventListener('pointercancel', onPointerUp)
-  }, [toolPosition])
+  }, [])
 
   const handleTaskPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return
-    if ((e.target as HTMLElement).closest('button, input, textarea, form, a, label')) return
+    if ((e.target as HTMLElement).closest('button, input, textarea, form, a, label, [role="checkbox"]')) return
 
     const card = taskCardRef.current
-    const currentPos = taskPosition ?? (card ? {
-      x: card.getBoundingClientRect().left,
-      y: card.getBoundingClientRect().top,
-    } : {
-      x: 28,
-      y: 88,
-    })
+    if (!card) return
 
-    taskDragStartRef.current = {
-      startX: e.clientX,
-      startY: e.clientY,
-      posX: currentPos.x,
-      posY: currentPos.y,
+    const handle = e.currentTarget
+    const pointerId = e.pointerId
+
+    try {
+      handle.setPointerCapture(pointerId)
+    } catch {
+      // Safe fallback if pointer capture fails
     }
+
+    const initialRect = card.getBoundingClientRect()
+    const startX = e.clientX
+    const startY = e.clientY
+    const initLeft = initialRect.left
+    const initTop = initialRect.top
+    const cardWidth = initialRect.width
+    const cardHeight = initialRect.height
+
+    const minX = 0
+    const maxX = Math.max(0, window.innerWidth - cardWidth)
+    const minY = 0
+    const maxY = Math.max(0, window.innerHeight - cardHeight)
+
+    let finalLeft = initLeft
+    let finalTop = initTop
+
     setIsDraggingTask(true)
 
     const onPointerMove = (ev: PointerEvent) => {
-      if (!taskDragStartRef.current) return
-      const deltaX = ev.clientX - taskDragStartRef.current.startX
-      const deltaY = ev.clientY - taskDragStartRef.current.startY
-      const cardWidth = taskCardRef.current?.offsetWidth ?? 360
-      const minX = 16
-      const maxX = Math.max(minX, window.innerWidth - cardWidth - 16)
-      const minY = 64
-      const maxY = Math.max(minY, window.innerHeight - 100)
+      const rawDeltaX = ev.clientX - startX
+      const rawDeltaY = ev.clientY - startY
+      const clampedX = Math.min(Math.max(initLeft + rawDeltaX, minX), maxX)
+      const clampedY = Math.min(Math.max(initTop + rawDeltaY, minY), maxY)
+      finalLeft = clampedX
+      finalTop = clampedY
 
-      setTaskPosition({
-        x: Math.min(Math.max(taskDragStartRef.current.posX + deltaX, minX), maxX),
-        y: Math.min(Math.max(taskDragStartRef.current.posY + deltaY, minY), maxY),
-      })
+      const renderDeltaX = clampedX - initLeft
+      const renderDeltaY = clampedY - initTop
+      card.style.transform = `translate3d(${renderDeltaX}px, ${renderDeltaY}px, 0)`
     }
 
     const onPointerUp = () => {
-      taskDragStartRef.current = null
-      setIsDraggingTask(false)
+      try {
+        handle.releasePointerCapture(pointerId)
+      } catch {
+        // Safe release
+      }
       window.removeEventListener('pointermove', onPointerMove)
       window.removeEventListener('pointerup', onPointerUp)
       window.removeEventListener('pointercancel', onPointerUp)
+
+      card.style.left = `${finalLeft}px`
+      card.style.top = `${finalTop}px`
+      card.style.transform = ''
+      setTaskPosition({ x: finalLeft, y: finalTop })
+      setIsDraggingTask(false)
     }
 
     window.addEventListener('pointermove', onPointerMove)
     window.addEventListener('pointerup', onPointerUp)
     window.addEventListener('pointercancel', onPointerUp)
-  }, [taskPosition])
+  }, [])
 
   useEffect(() => {
     const handleResize = () => {
-      const cardWidth = 360
-      const minX = 16
-      const maxX = Math.max(minX, window.innerWidth - cardWidth - 16)
-      const minY = 64
-      const maxY = Math.max(minY, window.innerHeight - 100)
+      const minX = 0
+      const minY = 0
 
       setToolPosition((prev) => {
         if (!prev) return null
+        const cardWidth = cardRef.current?.offsetWidth ?? 360
+        const cardHeight = cardRef.current?.offsetHeight ?? 300
+        const maxX = Math.max(minX, window.innerWidth - cardWidth)
+        const maxY = Math.max(minY, window.innerHeight - cardHeight)
         return {
           x: Math.min(Math.max(prev.x, minX), maxX),
           y: Math.min(Math.max(prev.y, minY), maxY),
@@ -235,6 +272,10 @@ export default function WorkspacePage() {
 
       setTaskPosition((prev) => {
         if (!prev) return null
+        const cardWidth = taskCardRef.current?.offsetWidth ?? 360
+        const cardHeight = taskCardRef.current?.offsetHeight ?? 300
+        const maxX = Math.max(minX, window.innerWidth - cardWidth)
+        const maxY = Math.max(minY, window.innerHeight - cardHeight)
         return {
           x: Math.min(Math.max(prev.x, minX), maxX),
           y: Math.min(Math.max(prev.y, minY), maxY),

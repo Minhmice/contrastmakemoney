@@ -6905,11 +6905,6 @@ html:has(body.auth-is-open) {
   transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), transform 120ms var(--ease-out);
 }
 
-.workspace-btn-primary:hover {
-  background: #b01419;
-  border-color: #b01419;
-}
-
 .workspace-btn-primary:active {
   transform: scale(0.97);
 }
@@ -6929,13 +6924,28 @@ html:has(body.auth-is-open) {
   transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), transform 120ms var(--ease-out);
 }
 
-.workspace-btn-secondary:hover {
-  background: rgba(243, 241, 234, 0.16);
-  border-color: rgba(243, 241, 234, 0.45);
-}
-
 .workspace-btn-secondary:active {
   transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .workspace-btn-primary:hover {
+    background: #b01419;
+    border-color: #b01419;
+  }
+
+  .workspace-btn-secondary:hover {
+    background: rgba(243, 241, 234, 0.16);
+    border-color: rgba(243, 241, 234, 0.45);
+  }
+
+  .workspace-ctrl-paper:hover {
+    background: #e7e4db;
+  }
+
+  .workspace-ctrl-red:hover {
+    background: #b01419;
+  }
 }
 
 .workspace-stage__footer-hint {
@@ -6964,10 +6974,6 @@ html:has(body.auth-is-open) {
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.workspace-ctrl-paper:hover {
-  background: #e7e4db;
-}
-
 .workspace-ctrl-red {
   min-height: 44px;
   border: 1px solid #e01920;
@@ -6982,26 +6988,56 @@ html:has(body.auth-is-open) {
   transition: background 0.15s ease;
 }
 
-.workspace-ctrl-red:hover {
-  background: #b01419;
-}
-
 /* Task panel items */
 .workspace-task-item {
+  position: relative;
   display: grid;
   grid-template-columns: 36px minmax(0, 1fr) auto;
   gap: 10px;
   align-items: center;
   padding: 12px 6px;
   border-bottom: 1px solid rgba(16, 17, 15, 0.14);
-  transition: background 0.15s ease;
   min-width: 0;
+  transition:
+    opacity 160ms var(--ease-out),
+    background-color 160ms var(--ease-out),
+    border-color 160ms var(--ease-out);
 }
 
+.workspace-task-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: #e01920;
+  transform: scaleY(0);
+  transform-origin: center;
+  transition: transform 160ms var(--ease-out);
+}
+
+.workspace-task-item[data-active='true'],
 .workspace-task-item--active {
   background: rgba(224, 25, 32, 0.06);
-  border-left: 3px solid #e01920;
   padding-left: 8px;
+}
+
+.workspace-task-item[data-active='true']::before,
+.workspace-task-item--active::before {
+  transform: scaleY(1);
+}
+
+.workspace-task-item[data-done='true'] {
+  opacity: 0.58;
+}
+
+.workspace-task-item [role='checkbox'] {
+  transition: transform 120ms var(--ease-out);
+}
+
+.workspace-task-item [role='checkbox']:active {
+  transform: scale(0.96);
 }
 
 .workspace-task-input {
@@ -7091,8 +7127,10 @@ html:has(body.auth-is-open) {
   transition: background 0.15s ease, transform 0.1s ease;
 }
 
-.workspace-tool-trigger:hover {
-  background: #1a1c18;
+@media (hover: hover) and (pointer: fine) {
+  .workspace-tool-trigger:hover {
+    background: #1a1c18;
+  }
 }
 
 .workspace-tool-trigger:active {
@@ -7177,6 +7215,8 @@ html:has(body.auth-is-open) {
 }
 
 .workspace-tool-card--dragging {
+  will-change: transform;
+  outline: 2px solid #e01920;
   box-shadow: 0 28px 70px -10px rgba(0, 0, 0, 0.75), 0 0 0 2px #e01920 !important;
   cursor: grabbing !important;
   user-select: none !important;
@@ -7214,9 +7254,11 @@ html:has(body.auth-is-open) {
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.workspace-tool-card__close-btn:hover {
-  background: rgba(16, 17, 15, 0.08);
-  border-color: #10110f;
+@media (hover: hover) and (pointer: fine) {
+  .workspace-tool-card__close-btn:hover {
+    background: rgba(16, 17, 15, 0.08);
+    border-color: #10110f;
+  }
 }
 
 /* Tool menu popover */
@@ -7404,9 +7446,11 @@ html:has(body.auth-is-open) {
     transform 120ms var(--ease-out);
 }
 
-.workspace-stepper-btn:hover {
-  background: #10110f;
-  color: #f3f1ea;
+@media (hover: hover) and (pointer: fine) {
+  .workspace-stepper-btn:hover {
+    background: #10110f;
+    color: #f3f1ea;
+  }
 }
 
 .workspace-stepper-value {
@@ -7438,7 +7482,9 @@ html:has(body.auth-is-open) {
   .workspace-settings-dialog,
   .workspace-sheet-content,
   .workspace-stage__phase-copy,
-  .workspace-completion-mark {
+  .workspace-completion-mark,
+  .workspace-task-item::before,
+  .workspace-task-item [role='checkbox'] {
     transform: none !important;
     clip-path: none !important;
   }
