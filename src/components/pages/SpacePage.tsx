@@ -40,6 +40,7 @@ export default function SpacePage({ user: _user }: { user: User | null }) {
   const layerBRef = useRef<HTMLDivElement>(null)
   const transitionRef = useRef<MapTransition | null>(null)
   const flyTweenRef = useRef<gsap.core.Tween | null>(null)
+  const fallbackTimerRef = useRef<number | null>(null)
 
   const [activeLocation, setActiveLocation] = useState(0)
   const [visibleLayer, setVisibleLayer] = useState<MapLayer>('a')
@@ -57,6 +58,11 @@ export default function SpacePage({ user: _user }: { user: User | null }) {
   }, [])
 
   const completeTransition = useCallback(() => {
+    if (fallbackTimerRef.current) {
+      window.clearTimeout(fallbackTimerRef.current)
+      fallbackTimerRef.current = null
+    }
+
     const pending = transitionRef.current
     const stage = mapStageRef.current
     if (!pending || !pending.flyoutDone || !pending.incomingReady || !stage) return
@@ -162,11 +168,21 @@ export default function SpacePage({ user: _user }: { user: User | null }) {
         incomingReady: alreadyCached,
       }
 
+      if (fallbackTimerRef.current) {
+        window.clearTimeout(fallbackTimerRef.current)
+      }
+      fallbackTimerRef.current = window.setTimeout(() => {
+        if (transitionRef.current && transitionRef.current.targetIndex === index) {
+          transitionRef.current.incomingReady = true
+          tryCompleteTransition()
+        }
+      }, 700)
+
       setIsTransitioning(true)
       setLayerUrls((prev) => ({ ...prev, [incomingLayer]: to.embedUrl }))
       runFlyover(activeLocation, index, incomingLayer)
     },
-    [activeLocation, isTransitioning, layerUrls, runFlyover, visibleLayer],
+    [activeLocation, isTransitioning, layerUrls, runFlyover, tryCompleteTransition, visibleLayer],
   )
 
   const handleMapLoad = useCallback(
@@ -245,6 +261,7 @@ export default function SpacePage({ user: _user }: { user: User | null }) {
       }
     }, root)
     return () => {
+      if (fallbackTimerRef.current) window.clearTimeout(fallbackTimerRef.current)
       flyTweenRef.current?.kill()
       mm.revert()
     }
@@ -322,10 +339,21 @@ export default function SpacePage({ user: _user }: { user: User | null }) {
                 <button type="button" role="tab" aria-selected={activeLocation === index} aria-controls="space-map" id={'space-location-' + index} onClick={() => chooseLocation(index)}><span>CS{index + 1}</span><strong>{item.name}</strong><ArrowUpRight size={20} aria-hidden="true" /></button>
                 <div className="space-location__detail" aria-hidden={activeLocation !== index}>
                   <div className="space-location__detail-inner">
-                    <p>{item.note}</p>
-                    <address><MapPin size={17} aria-hidden="true" />{item.address}</address>
-                    <a href={'tel:' + item.phone.replace(/\s/g, '')}><Phone size={16} aria-hidden="true" />{item.phone}</a>
-                    <a href={item.mapsUrl} target="_blank" rel="noreferrer">MỞ GOOGLE MAPS <ArrowUpRight size={16} aria-hidden="true" /></a>
+                    <p className="space-location__note">{item.note}</p>
+                    <div className="space-location__info">
+                      <address className="space-location__meta-item">
+                        <MapPin size={16} aria-hidden="true" />
+                        <span>{item.address}</span>
+                      </address>
+                      <a className="space-location__meta-item space-location__phone" href={'tel:' + item.phone.replace(/\s/g, '')}>
+                        <Phone size={15} aria-hidden="true" />
+                        <span>{item.phone}</span>
+                      </a>
+                    </div>
+                    <a className="space-location__map-action" href={item.mapsUrl} target="_blank" rel="noreferrer">
+                      <span>MỞ GOOGLE MAPS</span>
+                      <ArrowUpRight size={14} aria-hidden="true" />
+                    </a>
                   </div>
                 </div>
               </article>)}

@@ -75,7 +75,14 @@ export function pomodoroReducer(state: PomodoroState, action: PomodoroAction): P
       return transition(state, false)
     case 'SET_SETTINGS': {
       const durationSeconds = getPhaseDurationSeconds(state.phase, action.settings)
-      return { ...state, settings: action.settings, durationSeconds, remainingSeconds: durationSeconds }
+      return {
+        ...state,
+        settings: action.settings,
+        status: 'idle',
+        durationSeconds,
+        remainingSeconds: durationSeconds,
+        endsAt: null,
+      }
     }
     case 'SET_DURATION':
       if (state.status === 'running' || !isValidDurationMinutes(action.minutes)) return state

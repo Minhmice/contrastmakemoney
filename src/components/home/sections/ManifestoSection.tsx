@@ -86,7 +86,6 @@ export function ManifestoSection() {
     <section ref={sectionRef} className="manifesto section-dark" id="contrast" aria-labelledby="manifesto-title">
       <header className="manifesto__intro">
         <h2 className="manifesto__title" id="manifesto-title">NGỒI XUỐNG.<br />LÀM TIẾP.</h2>
-        <p>Bản xem trước Contrast Workspace. Mở nhạc, gom việc, giữ nhịp cho buổi học này.</p>
       </header>
 
       <div className="manifesto__workbench" role="group" aria-label="Bản xem trước workspace">

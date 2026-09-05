@@ -62,7 +62,6 @@ export function FocusInterludeSection() {
         <PublicActionLink className="focus-trigger" href="/workspace">
           VÀO WORKSPACE
         </PublicActionLink>
-        <p className="focus-interlude__stamp">KIÊN TRÌ — KỶ LUẬT</p>
       </div>
     </section>
   )
