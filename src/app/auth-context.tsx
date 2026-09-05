@@ -17,13 +17,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let isMounted = true
+    let fallback = 0
     const updateUser = (nextUser: User | null) => {
       if (!isMounted) return
+      window.clearTimeout(fallback)
       setUser(nextUser)
       setIsLoading(false)
     }
 
-    const fallback = window.setTimeout(() => updateUser(null), 1200)
+    fallback = window.setTimeout(() => updateUser(null), 1200)
     void supabase.auth
       .getUser()
       .then(({ data }) => updateUser(data.user))
